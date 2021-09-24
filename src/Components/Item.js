@@ -1,5 +1,6 @@
-import React, { useRef } from "react";
+import React, { useRef, useContext } from "react";
 import { useDrag, useDrop } from "react-dnd";
+import { Context } from "./Context";
 
 // const ItemTypes = {
 //   ITEM: "item",
@@ -17,33 +18,31 @@ function Item(props) {
     },
   }));
 
-  const [{ isOver, canDrop }, drop] = useDrop(
-    () => ({
-      accept: "item",
-      canDrop: (item) => props.id !== item.id,
-      // hover: (item, monitor) => ,
-      drop: (item, monitor) =>
-        monitor.isOver() &&
-        props.setList((state) => {
-          let sourceIndex = state.findIndex((el) => el.id === item.id);
-          let targetIndex = state.findIndex((el) => el.id === props.id);
-          let result = state.slice();
-          const swap = (index1, index2, arr) => {
-            let temp = arr[index1];
-            arr[index1] = arr[index2];
-            arr[index2] = temp;
-          };
-          swap(sourceIndex, targetIndex, result);
-          return result;
-        }),
-      collect: (monitor) => ({
-        isOver: monitor.isOver(),
-        canDrop: monitor.canDrop(),
-        dropResult: monitor.getDropResult(),
-        didDrop: monitor.didDrop(),
+  const [{ isOver, canDrop }, drop] = useDrop(() => ({
+    accept: "item",
+    canDrop: (item) => props.id !== item.id,
+    // hover: (item, monitor) => ,
+    drop: (item, monitor) =>
+      monitor.isOver() &&
+      props.setList((state) => {
+        let sourceIndex = state.findIndex((el) => el.id === item.id);
+        let targetIndex = state.findIndex((el) => el.id === props.id);
+        let result = state.slice();
+        const swap = (index1, index2, arr) => {
+          let temp = arr[index1];
+          arr[index1] = arr[index2];
+          arr[index2] = temp;
+        };
+        swap(sourceIndex, targetIndex, result);
+        return result;
       }),
-    })
-  );
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+      dropResult: monitor.getDropResult(),
+      didDrop: monitor.didDrop(),
+    }),
+  }));
 
   const ref = useRef(null);
   const dragDropRef = drag(drop(ref));
@@ -52,69 +51,76 @@ function Item(props) {
   const y = props.y;
 
   //----
+  const [awkwardLoading] = useContext(Context).awkwardLoading;
+
   const itemStyle = Object.assign(
     {
-      margin: (isDragging || canDrop) ? 20 : 10,
-      opacity: isDragging || isOver ? 0.5 : 1,
-      transform: (isDragging || canDrop) && "scale(0.9)",
-      border: isDragging ? "none" : canDrop && "2px dashed #fff",
+      margin: 10,
+      opacity: (isDragging || isOver) && 0.5,
+      border: isDragging
+        ? "none"
+        : canDrop &&
+          document.getElementById("main").style.color === "rgb(43, 43, 43)"
+        ? "2px dashed #2b2b2b"
+        : canDrop && "2px dashed #eaeaea",
       justifySelf: x === "left" ? "flex-start" : "flex-end",
       alignSelf: y === "top" ? "flex-start" : "flex-end",
+      display: awkwardLoading ? "none" : "grid",
     },
-    canDrop
+    isDragging || canDrop
       ? {
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
+          margin: 20,
+          height: "60%",
           width: "80%",
-          height: "40%",
+          transform: "scale(0.9)",
         }
       : null
   );
 
   const itemStyleCenter = Object.assign(
     {
-      margin: isDragging || canDrop ? 10 : 0,
-      opacity: isDragging || isOver ? 0.5 : 1,
-      transform:
-        isDragging || canDrop
-          ? "scale(0.9) translate(-60%, -60%)"
-          : "translate(-50%, -50%)",
-      border: isDragging ? "none" : canDrop && "2px dashed #fff",
-      position: "absolute",
-      top: "50%",
-      left: "50%",
+      opacity: (isDragging || isOver) && 0.5,
+      border: isDragging
+        ? "none"
+        : canDrop &&
+          document.getElementById("main").style.color === "rgb(43, 43, 43)"
+        ? "2px dashed #2b2b2b"
+        : canDrop && "2px dashed #eaeaea",
+      gridColumn: "1 / 3",
+      gridRow: "2 / 3",
+      placeSelf: "center",
+      height: "100%",
+      display: awkwardLoading ? "none" : "grid",
     },
-    canDrop
+    isDragging || canDrop
       ? {
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
+          margin: 10,
           width: "80%",
-          height: "40%",
+          transform: (isDragging || canDrop) && "scale(0.9)",
         }
       : null
   );
 
   return (
-    <ItemProvider value={{ x, y }}>
+    <ItemProvider value={{ x, y, isDragging, canDrop }}>
       <div
+        id="item"
         ref={dragDropRef}
-        style={x !== "center" ? itemStyle : itemStyleCenter}
+        style={x === "center" ? itemStyleCenter : itemStyle}
+        hidden={awkwardLoading}
       >
         {props.el}
-        <div
-          style={{
-            fontSize: "0.5em",
-            textTransform: "uppercase",
-            position: "absolute",
-            bottom: 10,
-          }}
-        >
-          {canDrop && "> drop here to swap items <"}
-        </div>
+        {canDrop && (
+          <div
+            style={{
+              fontSize: "0.5em",
+              textTransform: "uppercase",
+              placeSelf: "center",
+            }}
+          >
+            {"> drop here to swap items <"}
+          </div>
+        )}
       </div>
     </ItemProvider>
   );

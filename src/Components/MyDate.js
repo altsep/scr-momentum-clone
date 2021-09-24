@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Context } from "../App";
+import { Context } from "./Context";
 import { ItemContext } from "./Item";
 
 function MyDate() {
@@ -20,20 +20,21 @@ function MyDate() {
     if (data) {
       setCurrentDate(data.toLocaleDateString("en-US"));
       setCurrentTime(
-        data.toLocaleTimeString("en-US", { hour12: false,  timeStyle: "short" })
+        data.toLocaleTimeString("en-US", { hour12: false, timeStyle: "short" })
       );
     }
   }, [data]);
 
-  const [dateDisplay, setDateDisplay] = useContext(Context).dateDisplayState;
-  const [hover, setHover] = useContext(Context).hoverDateState;
-  const { x } = React.useContext(ItemContext);
+  const [dateDisplay, setDateDisplay] = useContext(Context).dateDisplay;
+  const setHover = useContext(Context).hoverDate[1];
+  const { x, canDrop } = useContext(ItemContext);
   const dateSize = 2.5;
 
   return (
     <div
       id="date"
       style={{
+        placeSelf: (canDrop || x === "center") && "center",
         fontSize: x === "center" ? `${dateSize * 2}em` : `${dateSize}em`,
         userSelect: "none",
         display: "flex",

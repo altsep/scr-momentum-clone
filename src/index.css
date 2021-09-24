@@ -5,23 +5,14 @@
 
 body {
   font-family: "PT Mono", monospace;
-  background: #000 no-repeat center fixed;
+  background: #fff no-repeat center fixed;
   background-size: cover;
 }
-
-/* #crypto-details {
-  width: 100%;
-  text-align: end;
-} */
 
 #crypto-details > div {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-}
-
-#weather-details {
-  /* border-bottom: rgba(245, 245, 245, 0.849); */
 }
 
 #weather-details > p {

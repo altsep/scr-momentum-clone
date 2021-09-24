@@ -1,22 +1,24 @@
 import React, { useContext, useState } from "react";
-import { Context } from "../App";
+import { Context } from "./Context";
 import { SwitchSVG, RefreshSVG } from "../Misc/SVGs";
 import { ItemContext } from "./Item";
 
 function Controls() {
-  const { handleRefreshData, handleRefreshBackgroundImage } = useContext(Context);
-  const [dateDisplay, setDateDisplay] = useContext(Context).dateDisplayState;
-  const [hoverDate, setHoverDate] = useContext(Context).hoverDateState;
+  const { handleRefreshData, handleRefreshBackgroundImage } =
+    useContext(Context);
+  const [dateDisplay, setDateDisplay] = useContext(Context).dateDisplay;
+  const [hoverDate, setHoverDate] = useContext(Context).hoverDate;
   const [hoverRefreshData, setHoverRefreshData] = useState("");
   const [hoverRefreshBackground, setHoverRefreshBackground] = useState("");
-  const [hoverWeather, setHoverWeather] = useContext(Context).hoverWeatherState;
-  const [weatherUnits, setWeatherUnits] = useContext(Context).weatherUnitsState;
-  const { x } = useContext(ItemContext);
+  const [hoverWeather, setHoverWeather] = useContext(Context).hoverWeather;
+  const [weatherUnits, setWeatherUnits] = useContext(Context).weatherUnits;
+  const { x, canDrop } = useContext(ItemContext);
 
   return (
     <div
       style={Object.assign(
         {
+          placeSelf: (canDrop || x === "center") && "center",
           margin: 10,
           display: "flex",
         },

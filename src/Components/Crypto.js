@@ -1,26 +1,28 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useFetch } from "../Hooks/useFetch";
 import { useLoaderText } from "../Hooks/useLoaderText";
-import { Context } from "../App";
+import { Context } from "./Context";
 import { ItemContext } from "./Item";
 import { errorMessage } from "../Misc/minorElements";
 
 function Crypto() {
-  const url = 
-    "https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&market_data=true";
+  const url = (name) =>
+    `https://api.coingecko.com/api/v3/coins/${name}?localization=false&market_data=true`;
+  const [name, setName] = useState("bitcoin");
   const { refreshData } = useContext(Context);
-  const { state, handleLoadingImage } = useFetch(url, refreshData);
-  const { x } = useContext(ItemContext);
+  const { state, handleLoadingImage } = useFetch(url(name), refreshData);
+  const { x, canDrop } = useContext(ItemContext);
 
   const loaderText = useLoaderText(state.loading);
 
-  // console.log(x)
-
   return (
-    <div id="crypto" style={{ margin: 10 }}>
+    <div
+      id="crypto"
+      style={{ placeSelf: (canDrop || x === "center") && "center", margin: 10 }}
+    >
       {state.error
         ? (() => {
-            console.log(`Crypto: ${state.error}`);
+            console.log(`Crypto — ${state.error}`);
             return errorMessage;
           })()
         : state.loading
@@ -36,13 +38,14 @@ function Crypto() {
                   alignItems: "center",
                 }}
               >
+                {/* <div hidden={state.loadingImage}> */}
                 <img
                   src={state.data.image.thumb}
                   alt=""
-                  hidden={state.loadingImage}
                   onLoad={() => handleLoadingImage(false)}
                   onError={() => handleLoadingImage(false)}
                 />
+                {/* </div> */}
                 &nbsp;
                 <p>{state.data.name}</p>
               </div>

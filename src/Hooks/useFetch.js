@@ -4,30 +4,32 @@ export const useFetch = (url, bool) => {
   const [state, setState] = useState({
     data: null,
     loading: true,
-    loadingImage: false,
+    loadingImage: true,
     error: false,
   });
 
+  
   const handleLoadingImage = (bool) =>
-    setState((state) => ({ ...state, loadingImage: bool }));
-
+  setState((state) => ({ ...state, loadingImage: bool }));
+  
   const [isDouble, setIsDouble] = useState(false);
-
+  
   const handleReload = () => setIsDouble((state) => !state);
-
+  
   useEffect(() => {
     setState((state) => ({
       ...state,
       data: state.data,
       loading: true,
-      loadingImage: false,
+      loadingImage: true,
     }));
     fetch(url)
       .then((x) => {
         // console.log(x);
         if (x.ok) {
           return x.text();
-        } else throw Error(true);
+        }
+        // else throw Error(true);
       })
       .then((y) => {
         // console.log(y);
@@ -36,7 +38,8 @@ export const useFetch = (url, bool) => {
       })
       .then((z) => {
         // console.log(z);
-        if (
+        if (state.data && state.data.hasOwnProperty("errors")) throw Error;
+        else if (
           state.data &&
           state.data.hasOwnProperty("urls") &&
           z.urls.regular === state.data.urls.regular
@@ -48,7 +51,6 @@ export const useFetch = (url, bool) => {
             ...state,
             data: z,
             loading: false,
-            loadingImage: true,
           }));
       })
       .catch((err) => {
@@ -60,9 +62,9 @@ export const useFetch = (url, bool) => {
             loadingImage: false,
             error: err,
           }));
-        } else setState((state) => ({ ...state, loading: false, error: err }));
+        } else setState((state) => ({ ...state, loading: false, loadingImage: false, error: err }));
       });
   }, [url, bool, isDouble]);
 
-  return { state, handleLoadingImage, setState, handleReload };
+  return { state, setState, handleLoadingImage };
 };

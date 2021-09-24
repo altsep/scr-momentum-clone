@@ -1,20 +1,18 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useFetch } from "../Hooks/useFetch";
 import { useLoaderText } from "../Hooks/useLoaderText";
-import { Context } from "../App";
+import { Context } from "./Context";
 import { ItemContext } from "./Item";
 import { errorMessage } from "../Misc/minorElements";
 
-function Weather(props) {
+function Weather() {
   const [coords, setCoords] = useState({ data: {}, error: false });
   const [url, setUrl] = useState("");
-  const [units, setUnits] = useContext(Context).weatherUnitsState;
-  const [hover, setHover] = useContext(Context).hoverWeatherState;
+  const [units, setUnits] = useContext(Context).weatherUnits;
+  const setHover = useContext(Context).hoverWeather[1];
   const { refreshData } = useContext(Context);
-  const { x } = React.useContext(ItemContext);
-  const { state, handleLoadingImage } = useFetch(url, refreshData);
-
-  // console.log('refresh')
+  const { x, canDrop } = React.useContext(ItemContext);
+  const { state, handleLoadingImage, setState } = useFetch(url, refreshData);
 
   useEffect(() => {
     const options = {
@@ -28,7 +26,7 @@ function Weather(props) {
       setCoords((state) => ({ ...state, error: err }));
     };
 
-    let locationWatchId = navigator.geolocation.watchPosition(
+    const locationWatchId = navigator.geolocation.getCurrentPosition(
       (pos) => setCoords({ data: pos.coords, error: false }),
       error,
       options
@@ -36,7 +34,6 @@ function Weather(props) {
 
     return () => navigator.geolocation.clearWatch(locationWatchId);
   }, []);
-   
 
   useEffect(() => {
     setUrl(
@@ -51,36 +48,22 @@ function Weather(props) {
 
   const loaderText = useLoaderText(state.loading);
 
-  const Icon = () => (
-    <img
-      style={{
-        display: "flex",
-        margin: x !== "center" && "0 1em",
-        pointerEvents: "none",
-      }}
-      src={
-        state.data &&
-        `https://openweathermap.org/img/w/${state.data.weather[0].icon}.png`
-      }
-      alt=""
-      hidden={state.loadingImage}
-      onLoad={() => handleLoadingImage(false)}
-      onError={() => handleLoadingImage(false)}
-    />
-  );
-
   const flexStyle = x === "left" ? "start" : x === "center" ? "center" : "end";
 
+  const iconWithProps = (
+    <Icon state={state} handleLoadingImage={handleLoadingImage} x={x} />
+  );
+
   return (
-    <div style={{ margin: 10 }}>
+    <div style={{ placeSelf: (canDrop || x === "center") && "center", margin: 10, }}>
       {state.error ? (
         (() => {
-          console.log(`Weather: ${state.error}`);
+          console.log(`Weather — ${state.error}`);
           return errorMessage;
         })()
       ) : state.loading || !state.data ? (
         loaderText
-      ) : state.data !== null && x === "center" ? (
+      ) : state.data !== null && state.data.main && x === "center" ? (
         <div
           id="weather"
           style={{
@@ -138,7 +121,7 @@ function Weather(props) {
               }}
             >
               <p>{state.data.name}</p>
-              <Icon />
+              {iconWithProps}
             </div>
           </div>
           <div
@@ -194,7 +177,8 @@ function Weather(props) {
       ) : state.loading || !state.data ? (
         loaderText
       ) : (
-        state.data !== null && (
+        state.data !== null &&
+        state.data.main && (
           <div
             id="weather"
             style={{
@@ -223,7 +207,7 @@ function Weather(props) {
                 alignItems: "center",
               }}
             >
-              {x === "right" && <Icon />}
+              {x === "right" && iconWithProps}
               <div
                 id="weather-details"
                 style={{
@@ -246,7 +230,7 @@ function Weather(props) {
                     (units === "imperial" ? "m/s" : "mph")}
                 </p>
               </div>
-              {x === "left" && <Icon />}
+              {x === "left" && iconWithProps}
             </div>
           </div>
         )
@@ -254,5 +238,26 @@ function Weather(props) {
     </div>
   );
 }
+
+const Icon = (props) => {
+  return (
+    <div hidden={props.state.loadingImage}>
+      <img
+        style={{
+          display: "flex",
+          margin: props.x !== "center" && "0 1em",
+          pointerEvents: "none",
+        }}
+        src={
+          props.state.data &&
+          `https://openweathermap.org/img/w/${props.state.data.weather[0].icon}.png`
+        }
+        alt=""
+        onLoad={() => props.handleLoadingImage(false)}
+        onError={() => props.handleLoadingImage(false)}
+      />
+    </div>
+  );
+};
 
 export default Weather;
