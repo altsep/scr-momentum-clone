@@ -9,10 +9,17 @@ body {
   background-size: cover;
 }
 
-#crypto-details > div {
+.crypto-other > div {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+.crypto-center-instance {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  /* width: 100%;   */
 }
 
 #weather-details > p {

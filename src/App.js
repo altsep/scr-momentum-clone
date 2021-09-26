@@ -5,7 +5,8 @@ import Weather from "./Components/Weather";
 import Location from "./Components/Location";
 import Controls from "./Components/Controls";
 import CurrentDate from "./Components/MyDate";
-import BackgroundImage from "./Components/BackgroundImage";
+import Background from "./Components/BackgroundImage";
+import { Context } from "./Components/Context";
 
 function App() {
   const [itemList, setItemList] = useState([
@@ -15,12 +16,23 @@ function App() {
     { id: "location", el: <Location /> },
     { id: "controls", el: <Controls /> },
   ]);
+
+  const {
+    theme,
+    awkwardLoading,
+    unsplashState,
+    handleUnsplashBool: handleBool,
+  } = React.useContext(Context);
+
   return (
     <div
       id="main"
       style={{
-        color: "#f5f5f5",
-        textShadow: "0.1em 0.1em 0.1em #2b2b2b",
+        background: awkwardLoading[0]
+          ? "#fff"
+          : unsplashState.error && "#fcfcfc",
+        color: theme.color,
+        textShadow: theme.textShadow,
         fontSize: "1.5rem",
         height: "100vh",
         display: "grid",
@@ -41,7 +53,7 @@ function App() {
           />
         );
       })}
-      <BackgroundImage />
+      <Background />
     </div>
   );
 }

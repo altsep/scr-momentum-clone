@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Context } from "./Context";
-import lake from "../lake.jpg";
 import awkward from "../awkward.gif";
 import { useLoaderText } from "../Hooks/useLoaderText";
 
-function BackgroundImage() {
+function Background() {
   const [url, setUrl] = useState();
-  const { state, handleLoadingImage } = useContext(Context).backgroundImageData;
+  const { unsplashState: state, handleUnsplashBool: handleBool } =
+    useContext(Context);
 
   useEffect(() => {
     state.data && setUrl(state.data.urls.regular);
@@ -16,27 +16,18 @@ function BackgroundImage() {
   const [awkwardLoading, setAwkwardLoading] =
     useContext(Context).awkwardLoading;
 
-  useEffect(() => {
-    const main = document.getElementById("main").style;
-    if (awkwardLoading) {
-      main.color = "#2b2b2b";
-      main.textShadow = "2px 2px 2px #eaeaea";
-    } else {
-      main.color = "#ededed";
-      main.textShadow = "2px 2px 2px #2b2b2b";
-    }
-  }, [awkwardLoading, url]);
+  const [loadingTimeout] = useContext(Context).loadingTimeout;
 
+  // Determite initial loader's fate
   useEffect(() => {
     if (
-      (!state.loadingImage && url) ||
+      (!state.loadingImage && typeof url === "string") ||
       (loadingTimeout === false && state.loadingImage === false)
     )
       setAwkwardLoading(false);
-  }, [state.loadingImage, url]);
+  }, [state.loadingImage, url, loadingTimeout]);
 
   const loaderText = useLoaderText(awkwardLoading);
-  const [loadingTimeout] = useContext(Context).loadingTimeout;
 
   return (
     <>
@@ -45,12 +36,11 @@ function BackgroundImage() {
           <img
             id="background"
             style={{
-              zIndex: "-1",
               userSelect: "none",
               position: "absolute",
               top: "50%",
               left: "50%",
-              transform: "translate(-50%, -50%) scale(2)",
+              transform: "translate(-50%, -50%) scale(1.5)",
               filter: "contrast(200%) grayscale(100%)",
             }}
             src={awkward}
@@ -76,26 +66,33 @@ function BackgroundImage() {
         id="background"
         hidden={!url}
         style={{
-          zIndex: "-1",
+          zIndex: "0",
           position: "absolute",
           objectFit: "cover",
           width: "100%",
           height: "100%",
+          userSelect: "none",
         }}
-        src={url}
+        src={
+          state.data && typeof state.data.urls.regular === "string"
+            ? url
+            : undefined
+        }
         alt=""
         onLoad={() => {
-          handleLoadingImage(false);
+          handleBool("loadingImage", false);
         }}
         onError={() => {
-          handleLoadingImage(false);
+          handleBool("loadingImage", false);
+          handleBool("error", true);
           console.log("Couldn't load image.");
           // e.target.onerror = null;
           // e.target.src = lake;
         }}
+        onDoubleClick={() => handleBool("active", null, true)}
       />
     </>
   );
 }
 
-export default BackgroundImage;
+export default Background;

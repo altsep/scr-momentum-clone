@@ -1,27 +1,30 @@
 import { useEffect, useState } from "react";
 
-export const useFetch = (url, bool) => {
+export const useFetch = (url) => {
   const [state, setState] = useState({
     data: null,
     loading: true,
     loadingImage: true,
     error: false,
+    active: false,
   });
 
-  
-  const handleLoadingImage = (bool) =>
-  setState((state) => ({ ...state, loadingImage: bool }));
-  
-  const [isDouble, setIsDouble] = useState(false);
-  
-  const handleReload = () => setIsDouble((state) => !state);
-  
+  const handleBool = (key, bool, reload) => {
+    setState((state) => {
+      let result = { ...state };
+      if (reload) result[key] = !result[key];
+      else result[key] = bool;
+      return result;
+    });
+  };
+
   useEffect(() => {
     setState((state) => ({
       ...state,
       data: state.data,
       loading: true,
       loadingImage: true,
+      error: false,
     }));
     fetch(url)
       .then((x) => {
@@ -29,7 +32,7 @@ export const useFetch = (url, bool) => {
         if (x.ok) {
           return x.text();
         }
-        // else throw Error(true);
+        else throw Error(true);
       })
       .then((y) => {
         // console.log(y);
@@ -45,7 +48,7 @@ export const useFetch = (url, bool) => {
           z.urls.regular === state.data.urls.regular
         ) {
           console.log("Duplicate url found, repeating request.");
-          handleReload();
+          handleBool("active", null, true);
         } else
           setState((state) => ({
             ...state,
@@ -62,9 +65,15 @@ export const useFetch = (url, bool) => {
             loadingImage: false,
             error: err,
           }));
-        } else setState((state) => ({ ...state, loading: false, loadingImage: false, error: err }));
+        } else
+          setState((state) => ({
+            ...state,
+            loading: false,
+            loadingImage: false,
+            error: err,
+          }));
       });
-  }, [url, bool, isDouble]);
+  }, [url, state.active]);
 
-  return { state, setState, handleLoadingImage };
+  return { state, setState, handleBool };
 };

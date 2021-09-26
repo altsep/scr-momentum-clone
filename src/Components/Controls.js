@@ -4,8 +4,11 @@ import { SwitchSVG, RefreshSVG } from "../Misc/SVGs";
 import { ItemContext } from "./Item";
 
 function Controls() {
-  const { handleRefreshData, handleRefreshBackgroundImage } =
-    useContext(Context);
+  const {
+    handleUnsplashBool: handleImage,
+    handleCryptoBool: handleCrypto,
+    handleWeatherBool: handleWeather,
+  } = useContext(Context);
   const [dateDisplay, setDateDisplay] = useContext(Context).dateDisplay;
   const [hoverDate, setHoverDate] = useContext(Context).hoverDate;
   const [hoverRefreshData, setHoverRefreshData] = useState("");
@@ -96,7 +99,10 @@ function Controls() {
           alignItems: "center",
           marginRight: x !== "center" && "0.2rem",
         }}
-        onClick={handleRefreshData}
+        onClick={() => {
+          handleCrypto("active", null, true);
+          handleWeather("active", null, true);
+        }}
         onMouseOver={() => setHoverRefreshData("refresh-hovered")}
         onMouseLeave={() => setHoverRefreshData("")}
       >
@@ -119,7 +125,7 @@ function Controls() {
           justifyContent: "center",
           alignItems: "center",
         }}
-        onClick={handleRefreshBackgroundImage}
+        onClick={() => handleImage("active", null, true)}
         onMouseOver={() => setHoverRefreshBackground("refresh-hovered")}
         onMouseLeave={() => setHoverRefreshBackground("")}
       >

@@ -1,18 +1,21 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useFetch } from "../Hooks/useFetch";
 import { useLoaderText } from "../Hooks/useLoaderText";
 import { Context } from "./Context";
 import { ItemContext } from "./Item";
 import { errorMessage } from "../Misc/minorElements";
+import { logError } from "../Misc/minorElements";
 
 function Weather() {
   const [coords, setCoords] = useState({ data: {}, error: false });
-  const [url, setUrl] = useState("");
+  const {
+    setWeatherUrl: setUrl,
+    weatherState: state,
+    handleWeatherBool: handleBool,
+    theme,
+  } = useContext(Context);
   const [units, setUnits] = useContext(Context).weatherUnits;
   const setHover = useContext(Context).hoverWeather[1];
-  const { refreshData } = useContext(Context);
-  const { x, canDrop } = React.useContext(ItemContext);
-  const { state, handleLoadingImage, setState } = useFetch(url, refreshData);
+  const { x, canDrop } = useContext(ItemContext);
 
   useEffect(() => {
     const options = {
@@ -48,17 +51,17 @@ function Weather() {
 
   const loaderText = useLoaderText(state.loading);
 
-  const flexStyle = x === "left" ? "start" : x === "center" ? "center" : "end";
+  const flexStyle = useContext(ItemContext).flexStyle;
 
-  const iconWithProps = (
-    <Icon state={state} handleLoadingImage={handleLoadingImage} x={x} />
-  );
+  const iconWithProps = <Icon state={state} handleBool={handleBool} x={x} />;
 
   return (
-    <div style={{ placeSelf: (canDrop || x === "center") && "center", margin: 10, }}>
+    <div
+      style={{ placeSelf: (canDrop || x === "center") && "center", margin: 10 }}
+    >
       {state.error ? (
         (() => {
-          console.log(`Weather — ${state.error}`);
+          logError("Weather", state.error);
           return errorMessage;
         })()
       ) : state.loading || !state.data ? (
@@ -109,6 +112,7 @@ function Weather() {
                 (units === "imperial" ? "°C" : "°F")}
             </p>
             <div
+              className="border-line"
               style={{
                 marginTop: 20,
                 fontSize: "0.8em",
@@ -116,7 +120,7 @@ function Weather() {
                 flexDirection: "row",
                 justifyContent: "space-around",
                 alignItems: "center",
-                borderTop: "solid rgba(245, 245, 245, 0.6) 2px",
+                borderTop: theme.border,
                 paddingTop: 10,
               }}
             >
@@ -138,6 +142,7 @@ function Weather() {
           >
             <div
               id="weather-details"
+              className="border-line"
               style={{
                 marginLeft: 20,
                 fontSize: "0.8em",
@@ -145,7 +150,7 @@ function Weather() {
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: flexStyle,
-                borderLeft: "solid rgba(245, 245, 245, 0.6) 2px",
+                borderLeft: theme.border,
                 paddingLeft: 20,
               }}
             >
@@ -253,8 +258,8 @@ const Icon = (props) => {
           `https://openweathermap.org/img/w/${props.state.data.weather[0].icon}.png`
         }
         alt=""
-        onLoad={() => props.handleLoadingImage(false)}
-        onError={() => props.handleLoadingImage(false)}
+        onLoad={() => props.handleBool("loadingImage", false)}
+        onError={() => props.handleBool("loadingImage", false)}
       />
     </div>
   );
