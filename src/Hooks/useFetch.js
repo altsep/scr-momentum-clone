@@ -31,8 +31,7 @@ export const useFetch = (url) => {
         // console.log(x);
         if (x.ok) {
           return x.text();
-        }
-        else throw Error(true);
+        } else throw Error();
       })
       .then((y) => {
         // console.log(y);
@@ -41,8 +40,10 @@ export const useFetch = (url) => {
       })
       .then((z) => {
         // console.log(z);
-        if (state.data && state.data.hasOwnProperty("errors")) throw Error;
-        else if (
+        if (state.data && state.data.hasOwnProperty("errors")) {
+          console.log("Error", state.data.errors);
+          throw Error();
+        } else if (
           state.data &&
           state.data.hasOwnProperty("urls") &&
           z.urls.regular === state.data.urls.regular
@@ -57,21 +58,13 @@ export const useFetch = (url) => {
           }));
       })
       .catch((err) => {
-        // console.log(err);
-        if (state.error === err) {
-          setState((state) => ({
-            ...state,
-            loading: false,
-            loadingImage: false,
-            error: err,
-          }));
-        } else
-          setState((state) => ({
-            ...state,
-            loading: false,
-            loadingImage: false,
-            error: err,
-          }));
+        // console.log(err)
+        // console.log(err.toString())
+        setState((state) => ({
+          ...state,
+          loading: false,
+          error: true,
+        }));
       });
   }, [url, state.active]);
 

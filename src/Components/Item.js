@@ -49,6 +49,7 @@ function Item(props) {
 
   const x = props.x;
   const y = props.y;
+  const id = props.id;
 
   //-----
   const [awkwardLoading] = useContext(Context).awkwardLoading;
@@ -90,7 +91,6 @@ function Item(props) {
       gridColumn: "1 / 3",
       gridRow: "2 / 3",
       placeSelf: "center",
-      height: "100%",
       display: awkwardLoading ? "none" : "grid",
       zIndex: "1",
     },
@@ -101,14 +101,18 @@ function Item(props) {
           transform: (isDragging || canDrop) && "scale(0.9)",
         }
       : null
-  );  
+  );
 
   const flexStyle = x === "left" ? "start" : x === "center" ? "center" : "end";
 
+  const textAlignStyle = canDrop || x === "center" ? "center" : "start";
+
   return (
-    <ItemProvider value={{ x, y, isDragging, canDrop, flexStyle }}>
+    <ItemProvider
+      value={{ x, y, id, isDragging, canDrop, flexStyle, textAlignStyle }}
+    >
       <div
-        id="item"
+        className={`item ${id} ${x}`}
         ref={dragDropRef}
         style={x === "center" ? itemStyleCenter : itemStyle}
         hidden={awkwardLoading}

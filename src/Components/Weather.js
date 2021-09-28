@@ -6,7 +6,7 @@ import { errorMessage } from "../Misc/minorElements";
 import { logError } from "../Misc/minorElements";
 
 function Weather() {
-  const [coords, setCoords] = useState({ data: {}, error: false });
+  const [coords, setCoords] = useState({});
   const {
     setWeatherUrl: setUrl,
     weatherState: state,
@@ -15,7 +15,7 @@ function Weather() {
   } = useContext(Context);
   const [units, setUnits] = useContext(Context).weatherUnits;
   const setHover = useContext(Context).hoverWeather[1];
-  const { x, canDrop } = useContext(ItemContext);
+  const { x, id, canDrop, textAlignStyle } = useContext(ItemContext);
 
   useEffect(() => {
     const options = {
@@ -26,30 +26,36 @@ function Weather() {
 
     const error = (err) => {
       console.log(`ERROR(${err.code}): ${err.message}`);
-      setCoords((state) => ({ ...state, error: err }));
+      handleBool("error", true);
     };
 
     const locationWatchId = navigator.geolocation.getCurrentPosition(
-      (pos) => setCoords({ data: pos.coords, error: false }),
+      (pos) => setCoords(pos.coords),
       error,
       options
     );
 
     return () => navigator.geolocation.clearWatch(locationWatchId);
-  }, []);
+  }, [handleBool]);
 
   useEffect(() => {
-    setUrl(
-      coords.data.latitude !== undefined &&
-        `https://apis.scrimba.com/openweathermap/data/2.5/weather?lat=${
-          coords.data.latitude
-        }&lon=${coords.data.longitude}&units=${
-          units === "imperial" ? "metric" : "imperial"
-        }`
-    );
-  }, [coords.data.latitude, coords.data.longitude, units]);
+    coords
+      ? setUrl(
+          coords.latitude !== undefined &&
+            `https://apis.scrimba.com/openweathermap/data/2.5/weather?lat=${
+              coords.latitude
+            }&lon=${coords.longitude}&units=${
+              units === "imperial" ? "metric" : "imperial"
+            }`
+        )
+      : handleBool("error", true);
+  }, [coords.latitude, coords.longitude, units]);
 
-  const loaderText = useLoaderText(state.loading);
+  const loaderText = useLoaderText(
+    state.loading,
+    x === "center" && "1.4em",
+    textAlignStyle
+  );
 
   const flexStyle = useContext(ItemContext).flexStyle;
 
@@ -61,14 +67,14 @@ function Weather() {
     >
       {state.error ? (
         (() => {
-          logError("Weather", state.error);
+          // logError(id, state.error);
           return errorMessage;
         })()
-      ) : state.loading || !state.data ? (
+      ) : state.loading ? (
         loaderText
       ) : state.data !== null && state.data.main && x === "center" ? (
         <div
-          id="weather"
+          id={"weather"}
           style={{
             width: "18em",
             display: "flex",
@@ -114,7 +120,7 @@ function Weather() {
             <div
               className="border-line"
               style={{
-                marginTop: 20,
+                marginTop: 30,
                 fontSize: "0.8em",
                 display: "flex",
                 flexDirection: "row",
@@ -131,7 +137,7 @@ function Weather() {
           <div
             style={{
               marginTop: 10,
-              lineHeight: 1.5,
+              lineHeight: 2,
               display: "flex",
               flexDirection: "row",
               flexWrap: "wrap",
@@ -144,20 +150,16 @@ function Weather() {
               id="weather-details"
               className="border-line"
               style={{
-                marginLeft: 20,
+                marginLeft: 30,
                 fontSize: "0.8em",
                 fontWeight: "100",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: flexStyle,
                 borderLeft: theme.border,
-                paddingLeft: 20,
+                paddingLeft: 30,
               }}
             >
-              <p>
-                {state.data.main.temp.toFixed(1)}°
-                {units === "imperial" ? "C" : "F"}
-              </p>
               <p
                 style={{
                   textTransform: "capitalize",
@@ -259,7 +261,10 @@ const Icon = (props) => {
         }
         alt=""
         onLoad={() => props.handleBool("loadingImage", false)}
-        onError={() => props.handleBool("loadingImage", false)}
+        onError={() => {
+          props.handleBool("loadingImage", false);
+          console.log("Weather icon couldn't load");
+        }}
       />
     </div>
   );

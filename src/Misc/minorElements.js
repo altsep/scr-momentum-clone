@@ -1,10 +1,10 @@
 const errorMessage = (
-  <p style={{ fontStyle: "italic", fontSize: "1rem" }}>Error!1</p>
+  <p style={{ fontStyle: "italic", fontSize: "0.7em" }}>Error!1</p>
 );
 
 const logError = (str, prop) =>
   console.log(
-    `${str} — ${
+    `${str.replace(/^\w/, (a) => a.toUpperCase())}: ${
       prop === true ? "Unknown error." : typeof prop === "string" && prop
     }`
   );

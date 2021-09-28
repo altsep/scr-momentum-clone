@@ -6,7 +6,7 @@ import { logError } from "../Misc/minorElements";
 
 function Location() {
   const { unsplashState: state } = useContext(Context);
-  const { x, canDrop } = useContext(ItemContext);
+  const { x, id, canDrop, textAlignStyle } = useContext(ItemContext);
   const loaderText = useLoaderText(state.loadingImage);
   const { theme } = useContext(Context);
 
@@ -16,32 +16,29 @@ function Location() {
       style={{
         placeSelf: (canDrop || x === "center") && "center",
         margin: 10,
-        width: state.loadingImage || canDrop ? "6em" : x === "center" && "90vw",
+        width: state.loadingImage || canDrop ? "6em" : x === "center" && "600px",
         fontSize: x === "center" ? "1.4em" : "0.7em",
-        textAlign: state.loadingImage
-          ? "start"
-          : canDrop || x === "center"
-          ? x
-          : x === "right" && x,
+        textAlign: textAlignStyle,
         display: x === "center" && "grid",
         height: x === "center" && "100%",
       }}
     >
       {state.error ? (
         (() => {
-          logError("Location", state.error);
-          return "Couldn't load background image.";
+          // logError(id, state.error);
+          return <p style={{ fontStyle: "italic" }}>Couldn't load image.</p>;
         })()
       ) : state.loadingImage ? (
-        <p
+        <div
           style={{
             placeSelf: x === "center" && "center",
             textAlign: "left",
             width: "100%",
+            fontSize: "1.4em",
           }}
         >
           {loaderText}
-        </p>
+        </div>
       ) : (
         state.data !== null &&
         !state.loadingImage &&

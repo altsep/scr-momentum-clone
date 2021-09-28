@@ -15,11 +15,14 @@ body {
   justify-content: space-between;
 }
 
-.crypto-center-instance {
+.crypto-center-details-instance {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  /* width: 100%;   */
+}
+
+.crypto-center-details-instance-text {
+  font-size: 0.9em;
 }
 
 #weather-details > p {

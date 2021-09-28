@@ -5,7 +5,8 @@ const Provider = (props) => {
   // fetch image
   const unsplashUrl =
     "https://apis.scrimba.com/unsplash/photos/random?orientation=landscape";
-  // &query=<item> to search terms
+  // &query=<item> to search specific terms
+  const [unsplashQueryName, setUnsplashQueryName] = useState("");
   const { state: unsplashState, handleBool: handleUnsplashBool } =
     useFetch(unsplashUrl);
 
@@ -19,6 +20,7 @@ const Provider = (props) => {
 
   // fetch weather
   const [weatherUrl, setWeatherUrl] = useState("");
+  const [weatherName, setWeatherName] = useState("");
   const { state: weatherState, handleBool: handleWeatherBool } =
     useFetch(weatherUrl);
 
@@ -30,18 +32,19 @@ const Provider = (props) => {
 
   // Handling initial loader to display elements after timeout in error scenario and to display the loader just once
   const awkwardLoading = useState(true);
-  const loadingTimeout = useState(true);
+  const pseudoLoadingTimeout = useState(true);
   useEffect(() => {
-    const timeoutId = setTimeout(() => loadingTimeout[1](false), 2000);
+    const timeoutId = setTimeout(() => pseudoLoadingTimeout[1](false), 2000);
     // Use clean-up function to make the process repeatable
     // return () => clearTimeout(timeoutId);
-  }, [loadingTimeout]);
+  }, [pseudoLoadingTimeout]);
 
   // Theming to accomodate initial loader and possible failure to either fetch location or load image. Used instead backup image
   const [theme, setTheme] = useState({});
 
   const state = unsplashState;
   const error = state.error;
+  const url = state.data && state.data.urls.regular;
   useEffect(() => {
     const normal = {
       name: "normal",
@@ -57,8 +60,8 @@ const Provider = (props) => {
     };
     awkwardLoading[0] && (state.loadingImage || error)
       ? setTheme(awkward)
-      : !error && setTheme(normal);
-  }, [awkwardLoading[0], state.loadingImage, error]);
+      : !error && url && setTheme(normal);
+  }, [awkwardLoading[0], state.loadingImage, state.data, error]);
 
   return (
     <Context.Provider
@@ -75,7 +78,7 @@ const Provider = (props) => {
         hoverWeather,
         weatherUnits,
         awkwardLoading,
-        loadingTimeout,
+        pseudoLoadingTimeout,
         theme,
       }}
     >

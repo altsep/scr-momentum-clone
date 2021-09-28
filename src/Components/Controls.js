@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Context } from "./Context";
 import { SwitchSVG, RefreshSVG } from "../Misc/SVGs";
 import { ItemContext } from "./Item";
@@ -16,6 +16,34 @@ function Controls() {
   const [hoverWeather, setHoverWeather] = useContext(Context).hoverWeather;
   const [weatherUnits, setWeatherUnits] = useContext(Context).weatherUnits;
   const { x, canDrop } = useContext(ItemContext);
+
+  const weatherControls = (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        marginRight: x !== "center" && "0.2rem",
+      }}
+      onClick={() =>
+        setWeatherUnits((state) => (state === "metric" ? "imperial" : "metric"))
+      }
+      onMouseOver={() => setHoverWeather("swap-date-hovered")}
+      onMouseLeave={() => setHoverWeather("")}
+    >
+      <p
+        style={{
+          fontSize: "0.6rem",
+          marginRight: "0.15rem",
+          textTransform: "uppercase",
+        }}
+      >
+        {weatherUnits}
+      </p>
+      <SwitchSVG hoverClass={hoverWeather} />
+    </div>
+  );
 
   return (
     <div
@@ -38,33 +66,7 @@ function Controls() {
           : null
       )}
     >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          marginRight: x !== "center" && "0.2rem",
-        }}
-        onClick={() =>
-          setWeatherUnits((state) =>
-            state === "metric" ? "imperial" : "metric"
-          )
-        }
-        onMouseOver={() => setHoverWeather("swap-date-hovered")}
-        onMouseLeave={() => setHoverWeather("")}
-      >
-        <p
-          style={{
-            fontSize: "0.6rem",
-            marginRight: "0.15rem",
-            textTransform: "uppercase",
-          }}
-        >
-          {weatherUnits}
-        </p>
-        <SwitchSVG hoverClass={hoverWeather} />
-      </div>
+      {weatherControls}
       <div
         style={{
           display: "flex",

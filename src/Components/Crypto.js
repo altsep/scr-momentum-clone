@@ -13,9 +13,9 @@ function Crypto() {
     theme,
   } = useContext(Context);
 
-  const { x, canDrop, flexStyle } = useContext(ItemContext);
+  const { x, id, canDrop, flexStyle, textAlignStyle } = useContext(ItemContext);
 
-  const loaderText = useLoaderText(state.loading);
+  const loaderText = useLoaderText(state.loading, x === "center" && "1.4em");
 
   const [hovered, setHovered] = useState({
     logo: false,
@@ -33,45 +33,40 @@ function Crypto() {
 
   return (
     <div
-      id="crypto"
+      className="crypto-container"
       style={{
         placeSelf: (canDrop || x === "center") && "center",
         margin: 10,
         display: "grid",
       }}
     >
-      {state.error
+      {state.loading
+        ? loaderText
+        : state.error
         ? (() => {
-            logError("Crypto", state.error);
+            // logError(id, state.error);
             return errorMessage;
           })()
-        : state.loading
-        ? loaderText
         : state.data &&
           !state.loading && (
             <>
               {x === "center" ? (
                 <div
+                  className="crypto-center"
                   style={{
                     placeSelf: "center",
                     display: "grid",
-                    gridTemplateColumns: "5fr 1fr",
-                    gridTemplateRows: "1fr 1fr",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    maxWidth: "40%",
-                    height: "50%",
+                    gridTemplateColumns: "1fr 50px",
+                    gridTemplateRows: "2fr 1fr",
+                    width: "450px",
+                    gap: "0 20px",
                   }}
                 >
                   <div
                     style={{
                       gridColumn: "2 / 3",
-                      gridRow: "1 / 3",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                      height: "100%",
-                      marginLeft: 20,
+                      gridRow: "1 / 2",
+                      display: "grid",
                     }}
                   >
                     <a
@@ -94,48 +89,69 @@ function Crypto() {
                         }}
                       />
                     </a>
-                    <div>
-                      <a
-                        href={`https://twitter.com/${state.data.links.twitter_screen_name}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        onMouseEnter={() => handleHovered("twitter", true)}
-                        onMouseLeave={() => handleHovered("twitter", false)}
-                      >
-                        <TwitterSVG hovered={hovered.twitter} theme={theme} />
-                      </a>
-                      <a
-                        href={state.data.links.subreddit_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        onMouseEnter={() => handleHovered("reddit", true)}
-                        onMouseLeave={() => handleHovered("reddit", false)}
-                      >
-                        <RedditSVG hovered={hovered.reddit} theme={theme} />
-                      </a>
-                    </div>
                   </div>
                   <div
-                    className="crypto-details crypto-center"
+                    style={{
+                      alignSelf: "start",
+                      gridColumn: "2 / 3",
+                      gridRow: "2 / 3",
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <a
+                      href={`https://twitter.com/${state.data.links.twitter_screen_name}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      onMouseEnter={() => handleHovered("twitter", true)}
+                      onMouseLeave={() => handleHovered("twitter", false)}
+                    >
+                      <TwitterSVG hovered={hovered.twitter} theme={theme} />
+                    </a>
+                    <a
+                      href={state.data.links.subreddit_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      onMouseEnter={() => handleHovered("reddit", true)}
+                      onMouseLeave={() => handleHovered("reddit", false)}
+                    >
+                      <RedditSVG hovered={hovered.reddit} theme={theme} />
+                    </a>
+                  </div>
+                  <div
+                    className="crypto-center-details"
                     style={{
                       placeSelf: "start",
                       gridColumn: "1 / 2",
                       gridRow: "1 / 2",
+                      width: "250px",
                     }}
                   >
-                    <ul style={{ alignSelf: "center" }}>
-                      <li className="crypto-center-instance">
-                        <p>Current:</p>&nbsp;
-                        <p>
+                    <ul
+                      style={{
+                        alignSelf: "center",
+                        textDecoration: "none",
+                        listStyleType: "none",
+                        margin: 0,
+                        padding: 0,
+                      }}
+                    >
+                      <li className="crypto-center-details-instance">
+                        <p className="crypto-center-details-instance-text">
+                          Current:
+                        </p>
+                        <p className="crypto-center-details-instance-value">
                           {state.data.market_data.current_price.usd.toLocaleString(
                             "en-US",
                             { style: "currency", currency: "USD" }
                           )}
                         </p>
                       </li>
-                      <li className="crypto-center-instance">
-                        <p>High:</p>&nbsp;
-                        <p>
+                      <li className="crypto-center-details-instance">
+                        <p className="crypto-center-details-instance-text">
+                          High:
+                        </p>
+                        <p className="crypto-center-details-instance-value">
                           {state.data.market_data.high_24h.usd.toLocaleString(
                             "en-US",
                             {
@@ -145,9 +161,11 @@ function Crypto() {
                           )}
                         </p>
                       </li>
-                      <li className="crypto-center-instance">
-                        <p>Low:</p>&nbsp;
-                        <p>
+                      <li className="crypto-center-details-instance">
+                        <p className="crypto-center-details-instance-text">
+                          Low:
+                        </p>
+                        <p className="crypto-center-details-instance-value">
                           {state.data.market_data.low_24h.usd.toLocaleString(
                             "en-US",
                             {
@@ -161,22 +179,23 @@ function Crypto() {
                   </div>
                   <div
                     style={{
-                      marginTop: 40,
+                      placeSelf: "start",
                       fontSize: "0.6em",
                       gridColumn: "1 / 2",
                       gridRow: "2 / 3",
                     }}
                   >
-                    <div>
-                      {state.data.public_notice !== null
-                        ? state.data.public_notice
-                        : state.data.description.en !== null &&
-                          state.data.description.en.match(/[\w\s;-]*\./)[0]}
-                    </div>
+                    {state.data.public_notice !== null
+                      ? state.data.public_notice
+                      : state.data.description.en !== null &&
+                        state.data.description.en.match(/[\w\s;-]*\./)[0]}
                   </div>
                 </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column" }}>
+                <div
+                  className="crypto-normal"
+                  style={{ display: "flex", flexDirection: "column" }}
+                >
                   <a
                     id="crypto-name"
                     href={state.data.links.homepage[0]}
@@ -206,15 +225,16 @@ function Crypto() {
                     </div>
                   </a>
                   <div
-                    className="crypto-details crypto-other"
+                    className="crypto-normal-details"
                     style={{
                       marginTop: 10,
                       lineHeight: 1.4,
                       fontSize: "0.7em",
+                      textAlign: flexStyle,
                     }}
                   >
-                    <div>
-                      <p>Curr.&nbsp;</p>
+                    <div className="crypto-normal-details-instance">
+                      <p>Current</p>
                       <p>
                         {state.data.market_data.current_price.usd.toLocaleString(
                           "en-US",
@@ -222,8 +242,8 @@ function Crypto() {
                         )}
                       </p>
                     </div>
-                    <div>
-                      <p>High&nbsp;</p>
+                    <div className="crypto-normal-details-instance">
+                      <p>High</p>
                       <p>
                         {state.data.market_data.high_24h.usd.toLocaleString(
                           "en-US",
@@ -234,8 +254,8 @@ function Crypto() {
                         )}
                       </p>
                     </div>
-                    <div>
-                      <p>Low&nbsp;</p>
+                    <div className="crypto-normal-details-instance">
+                      <p>Low</p>
                       <p>
                         {state.data.market_data.low_24h.usd.toLocaleString(
                           "en-US",
