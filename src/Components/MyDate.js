@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Context } from "./Context";
 import { ItemContext } from "./Item";
+import ControlsSwitch from "./ControlsSwitch";
+import { useRect } from "../Hooks/useRect";
+import { IconSwitch } from "../Misc/Icons";
 
 function MyDate() {
   const [data, setData] = useState(new Date());
@@ -25,10 +27,16 @@ function MyDate() {
     }
   }, [data]);
 
-  const [dateDisplay, setDateDisplay] = useContext(Context).dateDisplay;
-  const setHover = useContext(Context).hoverDate[1];
-  const { x, canDrop } = useContext(ItemContext);
+  const { x, y, canDrop } = useContext(ItemContext);
   const dateSize = 2.5;
+
+  // Handle controls
+  const [text, setText] = useState("date");
+  const [active, setActive] = useState(false);
+  const [hover, setHover] = useState(false);
+
+  const rect = useRect("date", [hover, text]);
+  const minorRect = useRect("controls", [rect]);
 
   return (
     <div
@@ -41,24 +49,38 @@ function MyDate() {
         flexDirection: "column",
         alignItems: "center",
       }}
-      onClick={() =>
-        setDateDisplay((state) => (state === "date" ? "time" : "date"))
-      }
-      onMouseOver={() => setHover("swap-date-hovered")}
-      onMouseLeave={() => setHover("")}
+      onClick={() => setText((state) => (state === "date" ? "time" : "date"))}
+      onMouseDown={() => setActive(true)}
+      onMouseUp={() => setActive(false)}
+      onMouseOver={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
     >
       {x === "center" ? (
         <>
-          <p>{dateDisplay === "date" ? currentTime : currentDate}</p>
+          <p>{text === "date" ? currentTime : currentDate}</p>
           <p style={{ fontSize: "0.3em" }}>
-            {dateDisplay === "date" ? currentDate : currentTime}
+            {text === "date" ? currentDate : currentTime}
           </p>
         </>
-      ) : dateDisplay === "date" ? (
+      ) : text === "date" ? (
         <p>{currentTime}</p>
       ) : (
         <p>{currentDate}</p>
       )}
+      <ControlsSwitch
+        values={{
+          x,
+          y,
+          rect,
+          active,
+          setActive,
+          hover,
+          setHover,
+          minorRect,
+          text,
+          icon: <IconSwitch active={active} />,
+        }}
+      />
     </div>
   );
 }

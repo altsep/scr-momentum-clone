@@ -3,8 +3,8 @@ import Item from "./Components/Item";
 import Crypto from "./Components/Crypto";
 import Weather from "./Components/Weather";
 import Location from "./Components/Location";
-import Controls from "./Components/Controls";
 import CurrentDate from "./Components/MyDate";
+import Info from "./Components/Info";
 import Background from "./Components/BackgroundImage";
 import { Context } from "./Components/Context";
 
@@ -14,7 +14,7 @@ function App() {
     { id: "weather", el: <Weather /> },
     { id: "date", el: <CurrentDate /> },
     { id: "location", el: <Location /> },
-    { id: "controls", el: <Controls /> },
+    { id: "info", el: <Info /> },
   ]);
 
   const {
@@ -33,7 +33,6 @@ function App() {
           : unsplashState.error && "#fcfcfc",
         color: theme.color,
         textShadow: theme.textShadow,
-        fontSize: "1.5rem",
         height: "100vh",
         display: "grid",
         gridTemplateColumns: "1fr 1fr",

@@ -1,27 +1,38 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
-export const useLoaderText = (bool, size, align, width) => {
-  const [state, setState] = useState(".");
+export const useLoaderText = (bool, size, text) => {
+  const [state, setState] = useState((text || "Loading") + ".");
+  const ref = useRef(state);
   useEffect(() => {
-    setState("Loading.");
     let intervalId = setInterval(
       () =>
         setState((state) =>
-          bool && state.length < 10 ? state + "." : "Loading."
+          bool && state.length < ref.current.length + 2
+            ? state + "."
+            : ref.current
         ),
-      500
+      250
     );
     return () => clearInterval(intervalId);
-  }, [bool]);
+  }, [bool, text]);
   return (
-    <p
+    <div
       style={{
-        fontSize: size || "0.7em",
-        textAlign: align || "start",
-        width: width || "5.5em",
+        margin: 10,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
-      {state}
-    </p>
+      <p
+        style={{
+          fontSize: size || "0.7em",
+          textAlign: "start",
+          width: "6.5em",
+        }}
+      >
+        {state}
+      </p>
+    </div>
   );
 };

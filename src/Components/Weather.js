@@ -2,8 +2,10 @@ import React, { useState, useEffect, useContext } from "react";
 import { useLoaderText } from "../Hooks/useLoaderText";
 import { Context } from "./Context";
 import { ItemContext } from "./Item";
-import { errorMessage } from "../Misc/minorElements";
-import { logError } from "../Misc/minorElements";
+import { useErrorMessage } from "../Hooks/useErrorMessage";
+import ControlsSwitch from "./ControlsSwitch";
+import { useRect } from "../Hooks/useRect";
+import { IconSwitch } from "../Misc/Icons";
 
 function Weather() {
   const [coords, setCoords] = useState({});
@@ -13,9 +15,11 @@ function Weather() {
     handleWeatherBool: handleBool,
     theme,
   } = useContext(Context);
-  const [units, setUnits] = useContext(Context).weatherUnits;
-  const setHover = useContext(Context).hoverWeather[1];
-  const { x, id, canDrop, textAlignStyle } = useContext(ItemContext);
+
+  const { x, y, canDrop, flexStyleX, flexStyleY, textAlignStyle } =
+    useContext(ItemContext);
+
+  const { ErrorMessage, setErrorMessage } = useErrorMessage();
 
   useEffect(() => {
     const options = {
@@ -27,6 +31,7 @@ function Weather() {
     const error = (err) => {
       console.log(`ERROR(${err.code}): ${err.message}`);
       handleBool("error", true);
+      setErrorMessage("Geolocation failed");
     };
 
     const locationWatchId = navigator.geolocation.getCurrentPosition(
@@ -36,7 +41,9 @@ function Weather() {
     );
 
     return () => navigator.geolocation.clearWatch(locationWatchId);
-  }, [handleBool]);
+  }, []);
+
+  const [text, setText] = useState("imperial");
 
   useEffect(() => {
     coords
@@ -45,204 +52,213 @@ function Weather() {
             `https://apis.scrimba.com/openweathermap/data/2.5/weather?lat=${
               coords.latitude
             }&lon=${coords.longitude}&units=${
-              units === "imperial" ? "metric" : "imperial"
+              text === "imperial" ? "metric" : "imperial"
             }`
         )
       : handleBool("error", true);
-  }, [coords.latitude, coords.longitude, units]);
+  }, [coords.latitude, coords.longitude, text]);
 
   const loaderText = useLoaderText(
     state.loading,
-    x === "center" && "1.4em",
-    textAlignStyle
+    x === "center" && "1.4em"
   );
-
-  const flexStyle = useContext(ItemContext).flexStyle;
 
   const iconWithProps = <Icon state={state} handleBool={handleBool} x={x} />;
 
+  // Handle controls
+  const [active, setActive] = useState(false);
+  const [hover, setHover] = useState(false);
+
+  const rect = useRect("weather", [hover, text]);
+  const minorRect = useRect("controls", [rect]);
+
   return (
-    <div
-      style={{ placeSelf: (canDrop || x === "center") && "center", margin: 10 }}
-    >
+    <>
       {state.error ? (
-        (() => {
-          // logError(id, state.error);
-          return errorMessage;
-        })()
+        <ErrorMessage />
       ) : state.loading ? (
-        loaderText
-      ) : state.data !== null && state.data.main && x === "center" ? (
-        <div
-          id={"weather"}
-          style={{
-            width: "18em",
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: flexStyle,
-            alignItems: flexStyle,
-            textAlign: flexStyle,
-            padding: 0,
-          }}
-          onClick={() => setUnits(units === "imperial" ? "metric" : "imperial")}
-          onMouseOver={() => setHover("swap-date-hovered")}
-          onMouseLeave={() => setHover("")}
-        >
-          <div
-            style={{
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              alignItems: flexStyle,
-            }}
-          >
-            <p
-              style={{
-                fontSize: "3em",
-                fontWeight: "700",
-              }}
-            >
-              {state.data.main.temp.toFixed(1) +
-                (units === "imperial" ? "°C" : "°F")}
-            </p>
-            <p
-              style={{
-                marginTop: 10,
-                fontSize: "0.7em",
-                fontWeight: "100",
-              }}
-            >
-              Feels like&nbsp;
-              {state.data.main.feels_like.toFixed(1) +
-                (units === "imperial" ? "°C" : "°F")}
-            </p>
-            <div
-              className="border-line"
-              style={{
-                marginTop: 30,
-                fontSize: "0.8em",
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-around",
-                alignItems: "center",
-                borderTop: theme.border,
-                paddingTop: 10,
-              }}
-            >
-              <p>{state.data.name}</p>
-              {iconWithProps}
-            </div>
-          </div>
-          <div
-            style={{
-              marginTop: 10,
-              lineHeight: 2,
-              display: "flex",
-              flexDirection: "row",
-              flexWrap: "wrap",
-              justifyContent: flexStyle,
-              alignItems: "center",
-              width: "100%",
-            }}
-          >
-            <div
-              id="weather-details"
-              className="border-line"
-              style={{
-                marginLeft: 30,
-                fontSize: "0.8em",
-                fontWeight: "100",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: flexStyle,
-                borderLeft: theme.border,
-                paddingLeft: 30,
-              }}
-            >
-              <p
-                style={{
-                  textTransform: "capitalize",
-                }}
-              >
-                {state.data.weather[0].description}
-              </p>
-              <p>
-                {state.data.wind.speed.toFixed()}
-                {units === "imperial" ? "m/s" : "mph"}
-              </p>
-              <p>{state.data.main.humidity}%</p>
-              <p>{state.data.main.pressure}hPa</p>
-            </div>
-          </div>
-        </div>
-      ) : state.error ? (
-        (() => {
-          console.log(`Weather: ${state.error}`);
-          return errorMessage;
-        })()
-      ) : state.loading || !state.data ? (
         loaderText
       ) : (
         state.data !== null &&
         state.data.main && (
           <div
-            id="weather"
+            id="weather-container"
             style={{
-              width: "7em",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: flexStyle,
-              alignItems: flexStyle,
-              textAlign: flexStyle,
-              padding: 0,
+              placeSelf: (canDrop || x === "center") && "center",
+              margin: 10,
             }}
             onClick={() =>
-              setUnits(units === "imperial" ? "metric" : "imperial")
+              setText((state) => (state === "imperial" ? "metric" : "imperial"))
             }
-            onMouseOver={() => setHover("swap-date-hovered")}
-            onMouseLeave={() => setHover("")}
+            onMouseDown={() => {
+              setActive(true);
+              setHover(false);
+            }}
+            onMouseUp={() => {
+              setActive(false);
+            }}
+            onMouseOver={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
           >
-            <p>{state.data.name}</p>
-            <div
-              style={{
-                lineHeight: 1.5,
-                display: "flex",
-                flexDirection: "row",
-                flexWrap: "wrap",
-                justifyContent: flexStyle,
-                alignItems: "center",
-              }}
-            >
-              {x === "right" && iconWithProps}
+            {x === "center" ? (
               <div
-                id="weather-details"
+                id="weather"
                 style={{
-                  marginTop: 10,
-                  fontSize: "0.7em",
-                  fontWeight: "100",
+                  width: "18em",
                   display: "flex",
-                  flexDirection: "column",
-                  justifyContent: flexStyle,
-                  alignItems: flexStyle,
+                  flexDirection: "row",
+                  justifyContent: flexStyleX,
+                  alignItems: flexStyleY,
+                  textAlign: flexStyleX,
+                  padding: 0,
                 }}
               >
-                <p>
-                  {state.data.main.temp.toFixed(1) +
-                    (units === "imperial" ? "°C" : "°F")}
-                </p>
-                <p>{state.data.weather[0].main}</p>
-                <p>
-                  {state.data.wind.speed.toFixed() +
-                    (units === "imperial" ? "m/s" : "mph")}
-                </p>
+                <div
+                  style={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    alignItems: flexStyleX,
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: "3em",
+                      fontWeight: "700",
+                    }}
+                  >
+                    {state.data.main.temp.toFixed(1) +
+                      (text === "imperial" ? "°C" : "°F")}
+                  </p>
+                  <div
+                    className="weather details"
+                    style={{
+                      marginTop: 10,
+                      // fontSize: "0.7em",
+                      fontWeight: "100",
+                      display: "flex",
+                    }}
+                  >
+                    Feels like&nbsp;
+                    {state.data.main.feels_like.toFixed(1) +
+                      (text === "imperial" ? "°C" : "°F")}
+                  </div>
+                  <div
+                    className="weather border-line"
+                    style={{
+                      marginTop: 30,
+                      paddingTop: 10,
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      borderTop: theme.border,
+                    }}
+                  >
+                    <p className="title">{state.data.name}</p>
+                    {iconWithProps}
+                  </div>
+                </div>
+                <div
+                  className="weather details border-line"
+                  style={{
+                    marginLeft: 30,
+                    paddingLeft: 30,
+                    fontSize: "1em",
+                    fontWeight: "100",
+                    lineHeight: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: flexStyleY,
+                    borderLeft: theme.border,
+                    width: "50%",
+                    textAlign: "start",
+                  }}
+                >
+                  <p
+                    style={{
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    {state.data.weather[0].description}
+                  </p>
+                  <p>
+                    {state.data.wind.speed.toFixed()}
+                    {text === "imperial" ? "m/s" : "mph"}
+                  </p>
+                  <p>{state.data.main.humidity}%</p>
+                  <p>{state.data.main.pressure}hPa</p>
+                </div>
               </div>
-              {x === "left" && iconWithProps}
-            </div>
+            ) : (
+              <div
+                id="weather"
+                style={{
+                  // width: "7em",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: flexStyleY,
+                  alignItems: flexStyleX,
+                  textAlign: flexStyleX,
+                  padding: 0,
+                }}
+              >
+                <p className="weather title">{state.data.name}</p>
+                <div
+                  style={{
+                    lineHeight: 1.5,
+                    display: "flex",
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    justifyContent: flexStyleX,
+                    alignItems: "center",
+                  }}
+                >
+                  {x === "right" && iconWithProps}
+                  <div
+                    className="weather details"
+                    style={{
+                      marginTop: 10,
+                      fontWeight: "100",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: flexStyleY,
+                      alignItems: flexStyleX,
+                    }}
+                  >
+                    <p>
+                      {state.data.main.temp.toFixed(1) +
+                        (text === "imperial" ? "°C" : "°F")}
+                    </p>
+                    <p>{state.data.weather[0].main}</p>
+                    <p>
+                      {state.data.wind.speed.toFixed() +
+                        (text === "imperial" ? "m/s" : "mph")}
+                    </p>
+                  </div>
+                  {x === "left" && iconWithProps}
+                </div>
+              </div>
+            )}
+            <ControlsSwitch
+              values={{
+                x,
+                y,
+                rect,
+                minorRect,
+                active,
+                setActive,
+                hover,
+                setHover,
+                text,
+                icon: <IconSwitch active={active} />,
+              }}
+            />
           </div>
         )
       )}
-    </div>
+    </>
   );
 }
 

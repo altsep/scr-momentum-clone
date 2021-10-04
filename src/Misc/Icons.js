@@ -1,8 +1,8 @@
-const SwitchSVG = (props) => (
+const Switch = (props) => (
   <svg
     height="30px"
     xmlns="http://www.w3.org/2000/svg"
-    className={props.hoverClass}
+    className={props.active ? "icon-switch" : undefined}
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -16,11 +16,11 @@ const SwitchSVG = (props) => (
   </svg>
 );
 
-const RefreshSVG = (props) => (
+const Refresh = (props) => (
   <svg
     height="30px"
     xmlns="http://www.w3.org/2000/svg"
-    className={props.hoverClass}
+    className={props.hovered ? "icon-refresh" : undefined}
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -45,7 +45,7 @@ const iconStyle = (props) =>
       }
     : null;
 
-const TwitterSVG = (props) => (
+const Twitter = (props) => (
   <svg
     fill={props.theme.color}
     xmlns="http://www.w3.org/2000/svg"
@@ -58,7 +58,7 @@ const TwitterSVG = (props) => (
   </svg>
 );
 
-const RedditSVG = (props) => (
+const Reddit = (props) => (
   <svg
     fill={props.theme.color}
     xmlns="http://www.w3.org/2000/svg"
@@ -71,4 +71,9 @@ const RedditSVG = (props) => (
   </svg>
 );
 
-export { SwitchSVG, RefreshSVG, TwitterSVG, RedditSVG };
+export {
+  Switch as IconSwitch,
+  Refresh as IconRefresh,
+  Twitter as IconTwitter,
+  Reddit as IconReddit,
+};

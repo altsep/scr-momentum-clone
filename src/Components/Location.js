@@ -2,49 +2,45 @@ import React, { useContext } from "react";
 import { useLoaderText } from "../Hooks/useLoaderText";
 import { Context } from "./Context";
 import { ItemContext } from "./Item";
-import { logError } from "../Misc/minorElements";
 
 function Location() {
   const { unsplashState: state } = useContext(Context);
-  const { x, id, canDrop, textAlignStyle } = useContext(ItemContext);
-  const loaderText = useLoaderText(state.loadingImage);
+  const { x, canDrop, flexStyleX } = useContext(ItemContext);
+  const loaderText = useLoaderText(state.loadingImage, x === "center" && "1em");
   const { theme } = useContext(Context);
 
   return (
-    <div
-      id="location"
-      style={{
-        placeSelf: (canDrop || x === "center") && "center",
-        margin: 10,
-        width: state.loadingImage || canDrop ? "6em" : x === "center" && "600px",
-        fontSize: x === "center" ? "1.4em" : "0.7em",
-        textAlign: textAlignStyle,
-        display: x === "center" && "grid",
-        height: x === "center" && "100%",
-      }}
-    >
+    <>
       {state.error ? (
-        (() => {
-          // logError(id, state.error);
-          return <p style={{ fontStyle: "italic" }}>Couldn't load image.</p>;
-        })()
+        <p style={{ fontStyle: "italic" }}>Couldn't load image.</p>
       ) : state.loadingImage ? (
-        <div
-          style={{
-            placeSelf: x === "center" && "center",
-            textAlign: "left",
-            width: "100%",
-            fontSize: "1.4em",
-          }}
-        >
-          {loaderText}
-        </div>
+        loaderText
       ) : (
         state.data !== null &&
         !state.loadingImage &&
         !Object.keys(state).includes("errors") &&
         !state.error && (
-          <>
+          <div
+            id="location"
+            className="details"
+            style={Object.assign(
+              {
+                placeSelf: (canDrop || x === "center") && "center",
+                margin: 10,
+                width:
+                  state.loadingImage || canDrop
+                    ? "6em"
+                    : x === "center" && "600px",
+                textAlign: flexStyleX,
+                fontSize: "0.9em",
+              },
+              x === "center" && {
+                fontSize: "1.4em",
+                display: "grid",
+                height: "100%",
+              }
+            )}
+          >
             {x === "center" ? (
               <div
                 style={{
@@ -59,7 +55,7 @@ function Location() {
               >
                 <p>{state.data.location.title || "?"}</p>
                 <div
-                  className="border-line"
+                  className="border-line details"
                   style={{
                     display: "flex",
                     flexDirection: "row",
@@ -127,10 +123,10 @@ function Location() {
                   : "?"}
               </p>
             )}
-          </>
+          </div>
         )
       )}
-    </div>
+    </>
   );
 }
 

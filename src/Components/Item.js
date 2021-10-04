@@ -64,19 +64,20 @@ function Item(props) {
           document.getElementById("main").style.color === "rgb(43, 43, 43)"
         ? "2px dashed #2b2b2b"
         : canDrop && "2px dashed #eaeaea",
-      justifySelf: x === "left" ? "flex-start" : "flex-end",
-      alignSelf: y === "top" ? "flex-start" : "flex-end",
+      justifySelf: x === "left" ? "start" : "end",
+      alignSelf: y === "top" ? "start" : "end",
       display: awkwardLoading ? "none" : "grid",
       zIndex: "1",
     },
-    isDragging || canDrop
-      ? {
-          margin: 20,
-          height: "60%",
-          width: "80%",
-          transform: "scale(0.9)",
-        }
-      : null
+    canDrop && {
+      margin: 20,
+      height: "80%",
+      width: "60%",
+      transform: "scale(0.9)",
+    },
+    isDragging && {
+      transform: "scale(0.9)",
+    }
   );
 
   const itemStyleCenter = Object.assign(
@@ -94,22 +95,33 @@ function Item(props) {
       display: awkwardLoading ? "none" : "grid",
       zIndex: "1",
     },
-    isDragging || canDrop
-      ? {
-          margin: 10,
-          width: "80%",
-          transform: (isDragging || canDrop) && "scale(0.9)",
-        }
-      : null
+    canDrop && {
+      margin: 20,
+      height: "100%",
+      width: "60%",
+      transform: (isDragging || canDrop) && "scale(0.9)",
+    },
+    isDragging && {
+      transform: "scale(0.9)",
+    }
   );
 
-  const flexStyle = x === "left" ? "start" : x === "center" ? "center" : "end";
-
+  const flexStyleX = x === "left" ? "start" : x === "center" ? "center" : "end";
+  const flexStyleY = y === "top" ? "start" : x === "center" ? "center" : "end";
   const textAlignStyle = canDrop || x === "center" ? "center" : "start";
 
   return (
     <ItemProvider
-      value={{ x, y, id, isDragging, canDrop, flexStyle, textAlignStyle }}
+      value={{
+        x,
+        y,
+        id,
+        isDragging,
+        canDrop,
+        flexStyleX,
+        flexStyleY,
+        textAlignStyle,
+      }}
     >
       <div
         className={`item ${id} ${x}`}

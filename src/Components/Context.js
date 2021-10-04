@@ -24,12 +24,6 @@ const Provider = (props) => {
   const { state: weatherState, handleBool: handleWeatherBool } =
     useFetch(weatherUrl);
 
-  // Utility info to pass to elements
-  const dateDisplay = useState("date");
-  const hoverDate = useState("");
-  const weatherUnits = useState("imperial");
-  const hoverWeather = useState("");
-
   // Handling initial loader to display elements after timeout in error scenario and to display the loader just once
   const awkwardLoading = useState(true);
   const pseudoLoadingTimeout = useState(true);
@@ -73,10 +67,6 @@ const Provider = (props) => {
         setWeatherUrl,
         weatherState,
         handleWeatherBool,
-        dateDisplay,
-        hoverDate,
-        hoverWeather,
-        weatherUnits,
         awkwardLoading,
         pseudoLoadingTimeout,
         theme,

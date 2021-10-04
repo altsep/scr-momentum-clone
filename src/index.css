@@ -7,32 +7,35 @@ body {
   font-family: "PT Mono", monospace;
   background: #fff no-repeat center fixed;
   background-size: cover;
+  font-size: 1.5rem;
 }
 
-.crypto-other > div {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+.title {
+  font-family: "Merriweather", sans-serif;
+  letter-spacing: 0.1rem;
 }
 
-.crypto-center-details-instance {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+.details {
+  font-family: "Open Sans", sans-serif;
+  letter-spacing: 0.08rem;
+  font-size: 0.8em;
 }
 
-.crypto-center-details-instance-text {
-  font-size: 0.9em;
+.crypto.details p:first-of-type {
+  margin-right: 10px;
+}
+.crypto.details.center p:first-of-type {
+  margin-right: 20px;
 }
 
 #weather-details > p {
   text-align: start;
 }
 
-.swap-date-hovered {
+.icon-switch {
   transform: scale(1.2);
 }
 
-.refresh-hovered {
+.icon-refresh {
   transform: rotate(-45deg);
 }
