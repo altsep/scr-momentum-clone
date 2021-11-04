@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useContext } from "react";
-import { ItemContext } from "./Item";
-import ControlsSwitch from "./ControlsSwitch";
-import { useRect } from "../Hooks/useRect";
-import { IconSwitch } from "../Misc/Icons";
+import React, { useState, useEffect, useContext } from 'react';
+import { ItemContext } from './Item';
+import ControlsSwitch from './ControlsSwitch';
+import { IconSwitch } from '../Misc/Icons';
 
 function MyDate() {
   const [data, setData] = useState(new Date());
-  const [currentDate, setCurrentDate] = useState("");
-  const [currentTime, setCurrentTime] = useState("");
+  const [currentDate, setCurrentDate] = useState('');
+  const [currentTime, setCurrentTime] = useState('');
   useEffect(() => {
     let dateIntervalId = setInterval(() => {
       setData(new Date());
@@ -20,69 +19,109 @@ function MyDate() {
   // See the Intl.DateTimeFormat() constructor for details on the Date.prototype.toLocaleTimeString() method parameters
   useEffect(() => {
     if (data) {
-      setCurrentDate(data.toLocaleDateString("en-US"));
+      setCurrentDate(data.toLocaleDateString('en-US'));
       setCurrentTime(
-        data.toLocaleTimeString("en-US", { hour12: false, timeStyle: "short" })
+        data.toLocaleTimeString('en-US', { hour12: false, timeStyle: 'short' })
       );
     }
   }, [data]);
 
-  const { x, y, canDrop } = useContext(ItemContext);
+  const { id, x, y, isDragging, canDrop } = useContext(ItemContext);
   const dateSize = 2.5;
 
   // Handle controls
-  const [text, setText] = useState("date");
+  const [text, setText] = useState('date');
   const [active, setActive] = useState(false);
   const [hover, setHover] = useState(false);
 
-  const rect = useRect("date", [hover, text]);
-  const minorRect = useRect("controls", [rect]);
+  const handleClick = () =>
+    setText((state) => (state === 'date' ? 'time' : 'date'));
+
+  useEffect(() => {
+    document.addEventListener('keydown', (e) => {
+      ((e.shiftKey && e.key.toLowerCase() === 't') ||
+        (e.shiftKey && e.key.toLowerCase() === 'd')) &&
+        handleClick();
+    });
+    return () =>
+      document.removeEventListener('keydown', (e) => {
+        ((e.shiftKey && e.key.toLowerCase() === 't') ||
+          (e.shiftKey && e.key.toLowerCase() === 'd')) &&
+          handleClick();
+      });
+  }, []);
 
   return (
     <div
-      id="date"
+      id='date-container'
       style={{
-        placeSelf: (canDrop || x === "center") && "center",
-        fontSize: x === "center" ? `${dateSize * 2}em` : `${dateSize}em`,
-        userSelect: "none",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
+        placeSelf: (canDrop || x === 'center') && 'center',
+        fontSize: x === 'center' ? `${dateSize * 2}em` : `${dateSize}em`,
+        userSelect: 'none',
+        display: 'flex',
+        flexDirection: x === 'center' ? 'column' : 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
       }}
-      onClick={() => setText((state) => (state === "date" ? "time" : "date"))}
+      onClick={handleClick}
       onMouseDown={() => setActive(true)}
       onMouseUp={() => setActive(false)}
-      onMouseOver={() => setHover(true)}
+      onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      {x === "center" ? (
-        <>
-          <p>{text === "date" ? currentTime : currentDate}</p>
-          <p style={{ fontSize: "0.3em" }}>
-            {text === "date" ? currentDate : currentTime}
-          </p>
-        </>
-      ) : text === "date" ? (
-        <p>{currentTime}</p>
+      {x === 'center' ? (
+        <DateFull
+          text={text}
+          currentDate={currentDate}
+          currentTime={currentTime}
+        />
       ) : (
-        <p>{currentDate}</p>
+        <DateSmall
+          text={text}
+          currentDate={currentDate}
+          currentTime={currentTime}
+        />
       )}
-      <ControlsSwitch
-        values={{
-          x,
-          y,
-          rect,
-          active,
-          setActive,
-          hover,
-          setHover,
-          minorRect,
-          text,
-          icon: <IconSwitch active={active} />,
-        }}
-      />
+      {!isDragging && !canDrop && (
+        <ControlsSwitch
+          props={{
+            id,
+            x,
+            y,
+            active,
+            setActive,
+            hover,
+            setHover,
+            text,
+            icon: <IconSwitch active={active} />,
+          }}
+        />
+      )}
     </div>
   );
 }
+
+const DateFull = ({ text, currentDate, currentTime }) => (
+  <div
+    className='date'
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}
+  >
+    <p>{text === 'date' ? currentTime : currentDate}</p>
+    <p style={{ fontSize: '0.3em' }}>
+      {text === 'date' ? currentDate : currentTime}
+    </p>
+  </div>
+);
+
+const DateSmall = ({ text, currentDate, currentTime }) => (
+  <div className='date'>
+    {text === 'date' ? <p>{currentTime}</p> : <p>{currentDate}</p>}
+  </div>
+);
 
 export default MyDate;

@@ -4,28 +4,51 @@
 }
 
 body {
-  font-family: "PT Mono", monospace;
+  font-family: 'PT Mono', monospace;
   background: #fff no-repeat center fixed;
   background-size: cover;
   font-size: 1.5rem;
 }
 
+.item > div {
+  margin: 10px;
+}
+
+#date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .title {
-  font-family: "Merriweather", sans-serif;
+  font-family: 'Merriweather', sans-serif;
   letter-spacing: 0.1rem;
 }
 
+input:focus {
+  border: 1px solid;
+  opacity: 0.9;
+  writing-mode: vertical-rl;
+  text-orientation: sideways;
+}
+
+input::placeholder {
+  font-size: 0.9em;
+  color: #f1f1f1a8;
+}
+
 .details {
-  font-family: "Open Sans", sans-serif;
+  font-family: 'Open Sans', sans-serif;
   letter-spacing: 0.08rem;
   font-size: 0.8em;
 }
 
-.crypto.details p:first-of-type {
-  margin-right: 10px;
+.crypto.details.left {
+  align-items: start;
 }
-.crypto.details.center p:first-of-type {
-  margin-right: 20px;
+
+.crypto.details.right {
+  align-items: end;
 }
 
 #weather-details > p {

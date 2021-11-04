@@ -1,14 +1,14 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from 'react';
 
-export const useLoaderText = (bool, size, text) => {
-  const [state, setState] = useState((text || "Loading") + ".");
-  const ref = useRef(state);
+export const useLoaderText = (bool, size, str) => {
+  const [text, setText] = useState((str || 'Loading') + '.');
+  const ref = useRef(text);
   useEffect(() => {
     let intervalId = setInterval(
       () =>
-        setState((state) =>
-          bool && state.length < ref.current.length + 2
-            ? state + "."
+        setText((text) =>
+          bool && text.length < ref.current.length + 2
+            ? text + '.'
             : ref.current
         ),
       250
@@ -17,21 +17,23 @@ export const useLoaderText = (bool, size, text) => {
   }, [bool, text]);
   return (
     <div
+      className='details'
       style={{
+        placeSelf: 'center',
         margin: 10,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
       }}
     >
       <p
         style={{
-          fontSize: size || "0.7em",
-          textAlign: "start",
-          width: "6.5em",
+          fontSize: size || '1rem',
+          textAlign: 'start',
+          width: '6em',
         }}
       >
-        {state}
+        {text}
       </p>
     </div>
   );

@@ -1,55 +1,49 @@
-const ControlsSwitch = ({ values }) => {
+const ControlsSwitch = ({ props }) => {
   const {
-    id,
-    minorRect,
     x,
     y,
-    rect,
-    active,
     setActive,
     hover,
-    setHover,
     text,
     icon,
-  } = values;
+    handleClick,
+  } = props;
 
   return (
     <div
-      id="controls"
+      id='controls'
       style={Object.assign(
         {
-          position: "absolute",
-          top: y === "top" ? rect.bottom : rect.top - 30 || undefined,
-          left: rect.left + rect.width / 2 - minorRect.width / 2,
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          transform: "scale(0.8)",
-          opacity: hover ? "1" : "0",
+          margin: x === 'center' ? '40px 0 0' : 10,
+          order: x === 'right' && -1,
+          alignSelf: y === 'top' ? 'start' : y === 'bottom' ? 'end' : 'center',
         },
-        x === "center" && {
-          top: rect.top - 50 || undefined,
-          left: rect.left ? rect.left + rect.width / 2 : undefined,
-          transform: "translateX(-50%)",
+        {
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: hover ? '0.9' : '0',
+        },
+        x === 'center' && {
+          transform: 'scale(1.5)',
         }
       )}
       onMouseDown={() => setActive(true)}
       onMouseUp={() => setActive(false)}
       onMouseEnter={() => {
-        setHover(true);
         setActive(true);
       }}
       onMouseLeave={() => {
-        setHover(false);
         setActive(false);
       }}
+      onClick={handleClick}
     >
       <p
         style={{
-          fontSize: "0.6rem",
-          marginRight: "0.15rem",
-          textTransform: "uppercase",
+          fontSize: '0.6rem',
+          marginRight: '0.25rem',
+          textTransform: 'uppercase',
         }}
       >
         {text}

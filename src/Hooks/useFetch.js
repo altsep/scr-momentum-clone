@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 export const useFetch = (url) => {
   const [state, setState] = useState({
@@ -6,6 +6,7 @@ export const useFetch = (url) => {
     loading: true,
     loadingImage: true,
     error: false,
+    errorDetails: '',
     active: false,
   });
 
@@ -26,12 +27,12 @@ export const useFetch = (url) => {
       loadingImage: true,
       error: false,
     }));
-    fetch(url)
+    fetch(url, {})
       .then((x) => {
         // console.log(x);
         if (x.ok) {
           return x.text();
-        } else throw Error();
+        } else throw Error(x.status);
       })
       .then((y) => {
         // console.log(y);
@@ -40,16 +41,18 @@ export const useFetch = (url) => {
       })
       .then((z) => {
         // console.log(z);
-        if (state.data && state.data.hasOwnProperty("errors")) {
-          console.log("Error", state.data.errors);
-          throw Error();
+        if (z !== null && z.hasOwnProperty('errors')) {
+          // console.log(state.data.errors)
+          throw Error(z.errors);
+        } else if (z !== null && z.message) {
+          throw Error(z.message);
         } else if (
           state.data &&
-          state.data.hasOwnProperty("urls") &&
+          state.data.hasOwnProperty('urls') &&
           z.urls.regular === state.data.urls.regular
         ) {
-          console.log("Duplicate url found, repeating request.");
-          handleBool("active", null, true);
+          console.log('Duplicate url found, repeating request.');
+          handleBool('active', null, true);
         } else
           setState((state) => ({
             ...state,
@@ -58,12 +61,13 @@ export const useFetch = (url) => {
           }));
       })
       .catch((err) => {
-        // console.log(err)
-        // console.log(err.toString())
+        // console.log(err);
         setState((state) => ({
           ...state,
           loading: false,
+          loadingImage: false,
           error: true,
+          errorDetails: err.message,
         }));
       });
   }, [url, state.active]);

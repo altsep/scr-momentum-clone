@@ -1,6 +1,6 @@
-import React, { useRef, useContext } from "react";
-import { useDrag, useDrop } from "react-dnd";
-import { Context } from "./Context";
+import React, { useRef, useContext, useEffect } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
+import { Context } from './Context';
 
 // const ItemTypes = {
 //   ITEM: "item",
@@ -8,7 +8,7 @@ import { Context } from "./Context";
 
 function Item(props) {
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: "item",
+    type: 'item',
     item: { id: props.id },
     collect: (monitor) => {
       return {
@@ -19,7 +19,7 @@ function Item(props) {
   }));
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
-    accept: "item",
+    accept: 'item',
     canDrop: (item) => props.id !== item.id,
     // hover: (item, monitor) => ,
     drop: (item, monitor) =>
@@ -56,27 +56,26 @@ function Item(props) {
 
   const itemStyle = Object.assign(
     {
-      margin: 10,
+      zIndex: '1',
       opacity: (isDragging || isOver) && 0.5,
       border: isDragging
-        ? "none"
+        ? 'none'
         : canDrop &&
-          document.getElementById("main").style.color === "rgb(43, 43, 43)"
-        ? "2px dashed #2b2b2b"
-        : canDrop && "2px dashed #eaeaea",
-      justifySelf: x === "left" ? "start" : "end",
-      alignSelf: y === "top" ? "start" : "end",
-      display: awkwardLoading ? "none" : "grid",
-      zIndex: "1",
+          document.getElementById('main').style.color === 'rgb(43, 43, 43)'
+        ? '2px dashed #2b2b2b'
+        : canDrop && '2px dashed #eaeaea',
+      justifySelf: x === 'left' ? 'start' : 'end',
+      alignSelf: y === 'top' ? 'start' : 'end',
+      display: awkwardLoading ? 'none' : 'grid',
     },
     canDrop && {
       margin: 20,
-      height: "80%",
-      width: "60%",
-      transform: "scale(0.9)",
+      height: '80%',
+      width: '60%',
+      transform: 'scale(0.9)',
     },
     isDragging && {
-      transform: "scale(0.9)",
+      transform: 'scale(0.9)',
     }
   );
 
@@ -84,31 +83,59 @@ function Item(props) {
     {
       opacity: (isDragging || isOver) && 0.5,
       border: isDragging
-        ? "none"
+        ? 'none'
         : canDrop &&
-          document.getElementById("main").style.color === "rgb(43, 43, 43)"
-        ? "2px dashed #2b2b2b"
-        : canDrop && "2px dashed #eaeaea",
-      gridColumn: "1 / 3",
-      gridRow: "2 / 3",
-      placeSelf: "center",
-      display: awkwardLoading ? "none" : "grid",
-      zIndex: "1",
+          document.getElementById('main').style.color === 'rgb(43, 43, 43)'
+        ? '2px dashed #2b2b2b'
+        : canDrop && '2px dashed #eaeaea',
+      gridColumn: '1 / 3',
+      gridRow: '2 / 3',
+      placeSelf: 'center',
+      display: awkwardLoading ? 'none' : 'grid',
+      zIndex: '1',
     },
     canDrop && {
       margin: 20,
-      height: "100%",
-      width: "60%",
-      transform: (isDragging || canDrop) && "scale(0.9)",
+      height: '100%',
+      width: '60%',
+      transform: (isDragging || canDrop) && 'scale(0.9)',
     },
     isDragging && {
-      transform: "scale(0.9)",
+      transform: 'scale(0.9)',
     }
   );
 
-  const flexStyleX = x === "left" ? "start" : x === "center" ? "center" : "end";
-  const flexStyleY = y === "top" ? "start" : x === "center" ? "center" : "end";
-  const textAlignStyle = canDrop || x === "center" ? "center" : "start";
+  const flexStyleX = x === 'left' ? 'start' : x === 'center' ? 'center' : 'end';
+  const flexStyleY = y === 'top' ? 'start' : x === 'center' ? 'center' : 'end';
+  // const textAlignStyle = canDrop || x === 'center' ? 'center' : 'start';
+
+  useEffect(() => {
+    document.addEventListener('keydown', (e) => {
+      for (let i = 0; i < document.querySelectorAll('.item').length; i++) {
+        if (
+          e.shiftKey &&
+          e.key.toLowerCase() === 'h' &&
+          document.querySelectorAll('.item')[i].style.display !== 'none'
+        ) {
+          document.querySelectorAll('.item')[i].style.display = 'none';
+        } else if (e.shiftKey && e.key.toLowerCase() === 'h')
+          document.querySelectorAll('.item')[i].style.display = 'grid';
+      }
+    });
+    return () =>
+      document.removeEventListener('keydown', (e) => {
+        for (let i = 0; i < document.querySelectorAll('.item').length; i++) {
+          if (
+            e.shiftKey &&
+            e.key.toLowerCase() === 'h' &&
+            document.querySelectorAll('.item')[i].style.display !== 'none'
+          ) {
+            document.querySelectorAll('.item')[i].style.display = 'none';
+          } else if (e.shiftKey && e.key.toLowerCase() === 'h')
+            document.querySelectorAll('.item')[i].style.display = 'grid';
+        }
+      });
+  }, []);
 
   return (
     <ItemProvider
@@ -120,25 +147,24 @@ function Item(props) {
         canDrop,
         flexStyleX,
         flexStyleY,
-        textAlignStyle,
       }}
     >
       <div
         className={`item ${id} ${x}`}
         ref={dragDropRef}
-        style={x === "center" ? itemStyleCenter : itemStyle}
+        style={x === 'center' ? itemStyleCenter : itemStyle}
         hidden={awkwardLoading}
       >
         {props.el}
         {canDrop && (
           <div
             style={{
-              fontSize: "0.5em",
-              textTransform: "uppercase",
-              placeSelf: "center",
+              fontSize: '0.5em',
+              textTransform: 'uppercase',
+              placeSelf: 'center',
             }}
           >
-            {"> drop here to swap items <"}
+            {'> drop here to swap items <'}
           </div>
         )}
       </div>
