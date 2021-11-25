@@ -3,7 +3,7 @@ import { useLoaderText } from '../Hooks/useLoaderText';
 import { Context } from './Context';
 import { ItemContext } from './Item';
 import { useErrorMessage } from '../Hooks/useErrorMessage';
-import ControlsSwitch from './ControlsSwitch';
+import ControlsSwitch from '../Misc/ControlsSwitch';
 import { IconSwitch } from '../Misc/Icons';
 import NamePlusInput from './NamePlusInput';
 
@@ -85,18 +85,30 @@ function Weather() {
     setUnits((state) => (state === 'imperial' ? 'metric' : 'imperial'));
 
   useEffect(() => {
-    document.addEventListener('keydown', (e) => {
+    const onKeyDown = (e) => {
       e.shiftKey && e.key.toLowerCase() === 'u' && handleClick();
-    });
-    return () =>
-      document.removeEventListener('keydown', (e) => {
-        e.shiftKey && e.key.toLowerCase() === 'u' && handleClick();
-      });
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
   }, []);
 
   useEffect(() => {
     state.data && state.data.name && handleBool('error', false);
   }, []);
+
+  const propsMain = {
+    id,
+    x,
+    state,
+    text: units,
+    theme,
+    flexStyleX,
+    flexStyleY,
+    iconWithProps,
+    setQuery: setCityName,
+    char: 'w',
+    handleClick: handleClick,
+  };
 
   return (
     <div
@@ -130,37 +142,9 @@ function Weather() {
             state.data &&
             state.data.main &&
             (x === 'center' ? (
-              <WeatherFull
-                props={{
-                  id,
-                  x,
-                  state,
-                  text: units,
-                  theme,
-                  flexStyleX,
-                  flexStyleY,
-                  iconWithProps,
-                  setQuery: setCityName,
-                  char: 'w',
-                  handleClick: handleClick,
-                }}
-              />
+              <WeatherFull props={propsMain} />
             ) : (
-              <WeatherSmall
-                props={{
-                  id,
-                  x,
-                  state,
-                  text: units,
-                  theme,
-                  flexStyleX,
-                  flexStyleY,
-                  iconWithProps,
-                  setQuery: setCityName,
-                  char: 'w',
-                  handleClick: handleClick,
-                }}
-              />
+              <WeatherSmall props={propsMain} />
             ))}
         {!isDragging && !canDrop && state.data && (
           <ControlsSwitch

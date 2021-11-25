@@ -108,18 +108,22 @@ function Crypto() {
                 }}
               >
                 <a
+                  className='crypto-icon-link'
                   href={`https://twitter.com/${state.data.links.twitter_screen_name}`}
                   target='_blank'
                   rel='noreferrer'
+                  style={iconStyle(hovered.twitter, theme)}
                   onMouseEnter={() => handleHovered('twitter', true)}
                   onMouseLeave={() => handleHovered('twitter', false)}
                 >
                   <IconTwitter hovered={hovered.twitter} theme={theme} />
                 </a>
                 <a
+                  className='crypto-icon-link'
                   href={state.data.links.subreddit_url}
                   target='_blank'
                   rel='noreferrer'
+                  style={iconStyle(hovered.reddit, theme)}
                   onMouseEnter={() => handleHovered('reddit', true)}
                   onMouseLeave={() => handleHovered('reddit', false)}
                 >
@@ -332,5 +336,17 @@ const Details = ({ state, handleHovered, hovered, x, currencyName }) => {
     </div>
   );
 };
+
+const iconStyle = (hovered, theme) =>
+  hovered
+    ? {
+        backgroundColor:
+          theme.name === 'normal'
+            ? 'rgba(43, 43, 43, 0.6)'
+            : 'rgba(237, 237, 237, 0.6)',
+        padding: 5,
+        borderRadius: '50%',
+      }
+    : { padding: 5 };
 
 export default Crypto;

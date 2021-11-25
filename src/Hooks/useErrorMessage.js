@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export const useErrorMessage = (state) => {
   const [errorText, setErrorText] = useState('An error occured.');

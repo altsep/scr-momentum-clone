@@ -5,20 +5,42 @@
 
 body {
   font-family: 'PT Mono', monospace;
-  background: #fff no-repeat center fixed;
+  background: #f1f1f1 no-repeat center fixed;
   background-size: cover;
   font-size: 1.5rem;
 }
 
 .item > div {
   margin: 10px;
+  overflow: hidden
 }
 
-#date {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.title {
+  overflow: visible
 }
+
+/* .item.center > div {
+  overflow: scroll;
+} */
+
+.item > #date-container {
+  margin: 0;
+  overflow: visible;
+}
+
+.item:hover {
+  background-color: #00000044;
+  border-radius: 10px;
+}
+
+.item.info:hover {
+  background-color: #00000000;
+  padding: 0;
+}
+
+/* .item.info.center {
+  overflow: hidden
+} */
 
 .title {
   font-family: 'Merriweather', sans-serif;
@@ -61,4 +83,20 @@ input::placeholder {
 
 .icon-refresh {
   transform: rotate(-45deg);
+}
+
+.crypto-icon-link {
+  padding: 10px
+}
+
+.crypto-icon-link:hover {
+  background-color: rgba(43, 43, 43, 0.6);
+  border-radius: 100%;
+}
+
+
+@media (max-height: 650px) {
+  .item.center:hover {
+    padding: 0;
+  }
 }

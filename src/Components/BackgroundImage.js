@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { Context } from './Context';
 import awkward from '../awkward.gif';
 import { useLoaderText } from '../Hooks/useLoaderText';
@@ -8,6 +8,8 @@ function Background() {
   const { unsplashState: state, handleUnsplashBool: handleBool } =
     useContext(Context);
 
+  // Urls object keys:
+  // raw, full, regular, small, thumb
   useEffect(() => {
     state.data && setUrl(state.data.urls.regular);
   }, [state.data]);
@@ -42,29 +44,38 @@ function Background() {
   const loaderText = useLoaderText(awkwardLoading, '1.5rem');
 
   // Handle keyboard controls
-  const doublePressRef = React.useRef(false);
+  const doublePressRef = useRef(false);
+  const doublePressRefAvailable = useRef(true);
 
   useEffect(() => {
-    document.addEventListener('keydown', (e) => {
+    const onKeyUp = (e) => {
       if (e.key.toLowerCase() === 'b' && !doublePressRef.current) {
         doublePressRef.current = true;
         setTimeout(() => (doublePressRef.current = false), 300);
-      } else if (e.key.toLowerCase() === 'b' && doublePressRef.current) {
+      } else if (
+        e.key.toLowerCase() === 'b' &&
+        doublePressRef.current &&
+        doublePressRefAvailable.current
+      ) {
         handleBool('active', null, true);
         doublePressRef.current = false;
+        doublePressRefAvailable.current = false;
+        setTimeout(() => (doublePressRefAvailable.current = true), 500);
       }
-    });
-    return () =>
-      document.addEventListener('keydown', (e) => {
-        if (e.key.toLowerCase() === 'b' && !doublePressRef.current) {
-          doublePressRef.current = true;
-          setTimeout(() => (doublePressRef.current = false), 300);
-        } else if (e.key.toLowerCase() === 'b' && doublePressRef.current) {
-          handleBool('active', null, true);
-          doublePressRef.current = false;
-        }
-      });
+    };
+    document.addEventListener('keyup', onKeyUp);
+    return () => {
+      document.removeEventListener('keyup', onKeyUp);
+    };
   }, []);
+
+  // useEffect(() => {
+  //   if (doublePress) {
+  //     handleBool('active', null, true);
+  //     setDoublePress(false);
+  //   }
+  //   console.log(doublePress);
+  // }, [doublePress, handleBool]);
 
   return (
     <>
@@ -72,6 +83,7 @@ function Background() {
         <img
           id='background'
           style={{
+            zIndex: '0',
             userSelect: 'none',
             position: 'absolute',
             top: '50%',
@@ -129,6 +141,25 @@ function Background() {
         }}
         onDoubleClick={() => handleBool('active', null, true)}
       />
+      {state.error && (
+        <div
+          style={{
+            zIndex: '0',
+            position: 'absolute',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            color: '#00000080',
+            textShadow: 'none',
+            fontSize: '5rem',
+            objectFit: 'cover',
+            width: '100%',
+            height: '100%',
+          }}
+        >
+          （゜;﹏;゜）
+        </div>
+      )}
     </>
   );
 }

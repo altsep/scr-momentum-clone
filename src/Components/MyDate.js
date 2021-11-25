@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { ItemContext } from './Item';
-import ControlsSwitch from './ControlsSwitch';
+import ControlsSwitch from '../Misc/ControlsSwitch';
 import { IconSwitch } from '../Misc/Icons';
 
 function MyDate() {
@@ -21,12 +21,12 @@ function MyDate() {
     if (data) {
       setCurrentDate(data.toLocaleDateString('en-US'));
       setCurrentTime(
-        data.toLocaleTimeString('en-US', { hour12: false, timeStyle: 'short' })
+        data.toLocaleTimeString('en-US', { hour12: true, timeStyle: 'short' })
       );
     }
   }, [data]);
 
-  const { id, x, y, isDragging, canDrop } = useContext(ItemContext);
+  const { id, x, y, flexStyleX, isDragging, canDrop } = useContext(ItemContext);
   const dateSize = 2.5;
 
   // Handle controls
@@ -38,17 +38,13 @@ function MyDate() {
     setText((state) => (state === 'date' ? 'time' : 'date'));
 
   useEffect(() => {
-    document.addEventListener('keydown', (e) => {
+    const onKeyDown = (e) => {
       ((e.shiftKey && e.key.toLowerCase() === 't') ||
         (e.shiftKey && e.key.toLowerCase() === 'd')) &&
         handleClick();
-    });
-    return () =>
-      document.removeEventListener('keydown', (e) => {
-        ((e.shiftKey && e.key.toLowerCase() === 't') ||
-          (e.shiftKey && e.key.toLowerCase() === 'd')) &&
-          handleClick();
-      });
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
   }, []);
 
   return (
@@ -74,12 +70,14 @@ function MyDate() {
           text={text}
           currentDate={currentDate}
           currentTime={currentTime}
+          flexStyleX={flexStyleX}
         />
       ) : (
         <DateSmall
           text={text}
           currentDate={currentDate}
           currentTime={currentTime}
+          flexStyleX={flexStyleX}
         />
       )}
       {!isDragging && !canDrop && (
@@ -101,14 +99,15 @@ function MyDate() {
   );
 }
 
-const DateFull = ({ text, currentDate, currentTime }) => (
+const DateFull = ({ text, currentDate, currentTime, flexStyleX }) => (
   <div
-    className='date'
+    className='date-full'
     style={{
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
+      textAlign: flexStyleX,
     }}
   >
     <p>{text === 'date' ? currentTime : currentDate}</p>
@@ -118,8 +117,14 @@ const DateFull = ({ text, currentDate, currentTime }) => (
   </div>
 );
 
-const DateSmall = ({ text, currentDate, currentTime }) => (
-  <div className='date'>
+const DateSmall = ({ text, currentDate, currentTime, flexStyleX }) => (
+  <div
+    className='date-small'
+    style={{
+      // whiteSpace: 'nowrap',
+      textAlign: flexStyleX,
+    }}
+  >
     {text === 'date' ? <p>{currentTime}</p> : <p>{currentDate}</p>}
   </div>
 );

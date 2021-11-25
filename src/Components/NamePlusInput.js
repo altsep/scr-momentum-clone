@@ -14,25 +14,34 @@ const NamePlusInput = ({ id, x, state, setQuery, titleText, theme, char }) => {
   const titleRef = useRef(null);
   const inputRef = useRef(null);
 
+  const [titleDisplay, setTitleDisplay] = useState('block');
+  const [inputDisplay, setInputDisplay] = useState('none');
+
   const handleNameDisplay = () => {
     if (titleRef.current !== null)
       if (id === 'crypto' && x === 'center') {
-        titleRef.current.style.display = 'block';
-      } else titleRef.current.style.display = 'none';
+        setTitleDisplay('block');
+      } else setTitleDisplay('none');
     if (inputRef.current !== null) {
-      inputRef.current.style.display = 'block';
+      setInputDisplay('block');
       setTimeout(() => inputRef.current.focus(), 1);
     }
   };
 
   useEffect(() => {
-    document.addEventListener('keydown', (e) => {
-      e.shiftKey && e.key.toLowerCase() === char && handleNameDisplay();
-    });
-    return () =>
-      document.removeEventListener('keydown', (e) => {
-        e.shiftKey && e.key.toLowerCase() === char && handleNameDisplay();
-      });
+    const onKeyDown = (e) => {
+      if (e.shiftKey && e.key.toLowerCase() === char) {
+        const el = document.getElementsByClassName('name-hidden-input');
+        let displayArr = [];
+        for (let i = 0; i < el.length; i++) {
+          const display = el[i].style.display;
+          displayArr.push(display);
+        }
+        if (displayArr.every((a) => a === 'none')) return handleNameDisplay();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
   }, [char, handleNameDisplay]);
 
   const handleSubmit = (e) => {
@@ -45,8 +54,8 @@ const NamePlusInput = ({ id, x, state, setQuery, titleText, theme, char }) => {
     inputRef.current.blur();
   };
 
-  // Some positioning gimmicks for crypto center.
-  const [inputPos, setInputPos] = useState();
+  // Some positional gimmicks for crypto center.
+  const [inputPos, setInputPos] = useState(0);
 
   useEffect(() => {
     const mainEl =
@@ -73,7 +82,12 @@ const NamePlusInput = ({ id, x, state, setQuery, titleText, theme, char }) => {
           }
       )}
     >
-      <p className='name' ref={titleRef} onClick={handleNameDisplay}>
+      <p
+        className='name'
+        ref={titleRef}
+        style={{ display: titleDisplay }}
+        onClick={handleNameDisplay}
+      >
         {titleName}
       </p>
       <input
@@ -81,7 +95,7 @@ const NamePlusInput = ({ id, x, state, setQuery, titleText, theme, char }) => {
         ref={inputRef}
         style={Object.assign(
           {
-            display: 'none',
+            display: inputDisplay,
             color: theme.color,
             textShadow: theme.textShadow,
             border: '0px',
@@ -101,13 +115,17 @@ const NamePlusInput = ({ id, x, state, setQuery, titleText, theme, char }) => {
         type='text'
         name='name'
         value={titleValue}
-        placeholder='Input request'
+        placeholder='Input request...'
         onChange={(e) => setTitleValue(e.target.value)}
-        onFocus={() => setTitleValue('')}
+        onFocus={() => {
+          setTitleValue('');
+        }}
         onBlur={(e) => {
           setTitleValue(titleName);
-          e.target.style.display = 'none';
-          titleRef.current.style.display = 'block';
+          // e.target.style.display = 'none';
+          // titleRef.current.style.display = 'block';
+          setInputDisplay('none');
+          setTitleDisplay('block');
         }}
         onKeyDown={(e) => {
           e.key === 'Enter'

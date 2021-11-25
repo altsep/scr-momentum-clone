@@ -1,14 +1,16 @@
-import React, { useRef, useContext, useEffect } from 'react';
+import React, { useRef, useContext, useState, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Context } from './Context';
 
-// const ItemTypes = {
-//   ITEM: "item",
-// };
+const ItemTypes = {
+  item: 'item',
+};
 
 function Item(props) {
+  const { x, y, id, infoExpanded } = props;
+
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: 'item',
+    type: ItemTypes.item,
     item: { id: props.id },
     collect: (monitor) => {
       return {
@@ -19,7 +21,7 @@ function Item(props) {
   }));
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
-    accept: 'item',
+    accept: ItemTypes.item,
     canDrop: (item) => props.id !== item.id,
     // hover: (item, monitor) => ,
     drop: (item, monitor) =>
@@ -28,12 +30,14 @@ function Item(props) {
         let sourceIndex = state.findIndex((el) => el.id === item.id);
         let targetIndex = state.findIndex((el) => el.id === props.id);
         let result = state.slice();
-        const swap = (index1, index2, arr) => {
+        const swapItems = (index1, index2, arr) => {
           let temp = arr[index1];
           arr[index1] = arr[index2];
           arr[index2] = temp;
         };
-        swap(sourceIndex, targetIndex, result);
+        swapItems(sourceIndex, targetIndex, result);
+        const storedResult = JSON.stringify(result.map((a) => a.id));
+        localStorage.setItem('items', storedResult);
         return result;
       }),
     collect: (monitor) => ({
@@ -47,12 +51,29 @@ function Item(props) {
   const ref = useRef(null);
   const dragDropRef = drag(drop(ref));
 
-  const x = props.x;
-  const y = props.y;
-  const id = props.id;
-
-  //-----
+  //----
   const [awkwardLoading] = useContext(Context).awkwardLoading;
+
+  const [itemsHidden, setItemsHidden] = React.useState(false);
+
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
+
+  useEffect(() => {
+    setDimensions();
+    window.addEventListener('resize', () => setDimensions());
+    return () => window.removeEventListener('resize', () => setDimensions());
+  }, []);
+
+  useEffect(() => setDimensions(), [infoExpanded]);
+
+  const setDimensions = () =>
+    setWindowDimensions({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
 
   const itemStyle = Object.assign(
     {
@@ -66,13 +87,15 @@ function Item(props) {
         : canDrop && '2px dashed #eaeaea',
       justifySelf: x === 'left' ? 'start' : 'end',
       alignSelf: y === 'top' ? 'start' : 'end',
-      display: awkwardLoading ? 'none' : 'grid',
+      display: itemsHidden ? 'none' : 'grid',
+      maxWidth: window.innerWidth / 2 - 20,
+      maxHeight: '95%',
+      gridRow: y === 'bottom' && '3 / 4',
     },
     canDrop && {
-      margin: 20,
-      height: '80%',
-      width: '60%',
-      transform: 'scale(0.9)',
+      margin: 10,
+      height: '100%',
+      width: '100%',
     },
     isDragging && {
       transform: 'scale(0.9)',
@@ -91,14 +114,22 @@ function Item(props) {
       gridColumn: '1 / 3',
       gridRow: '2 / 3',
       placeSelf: 'center',
-      display: awkwardLoading ? 'none' : 'grid',
       zIndex: '1',
+      display:
+        awkwardLoading || itemsHidden || windowDimensions.height < 720
+          ? 'none'
+          : 'grid',
+      maxWidth: window.innerWidth - 24,
+      maxHeight: '95%',
+      borderRadius: 20,
+      padding: 50,
+      backgroundColor: infoExpanded && '#00000000',
     },
     canDrop && {
-      margin: 20,
+      borderRadius: 0,
+      padding: 0,
       height: '100%',
-      width: '60%',
-      transform: (isDragging || canDrop) && 'scale(0.9)',
+      width: '100%',
     },
     isDragging && {
       transform: 'scale(0.9)',
@@ -107,34 +138,19 @@ function Item(props) {
 
   const flexStyleX = x === 'left' ? 'start' : x === 'center' ? 'center' : 'end';
   const flexStyleY = y === 'top' ? 'start' : x === 'center' ? 'center' : 'end';
-  // const textAlignStyle = canDrop || x === 'center' ? 'center' : 'start';
 
+  // Handle controls for "hide all"
   useEffect(() => {
-    document.addEventListener('keydown', (e) => {
-      for (let i = 0; i < document.querySelectorAll('.item').length; i++) {
-        if (
-          e.shiftKey &&
-          e.key.toLowerCase() === 'h' &&
-          document.querySelectorAll('.item')[i].style.display !== 'none'
-        ) {
-          document.querySelectorAll('.item')[i].style.display = 'none';
-        } else if (e.shiftKey && e.key.toLowerCase() === 'h')
-          document.querySelectorAll('.item')[i].style.display = 'grid';
-      }
-    });
+    const onKeyDown = (e) =>
+      e.shiftKey &&
+      e.key.toLowerCase() === 'h' &&
+      setItemsHidden((state) => !state);
+    document.addEventListener('keydown', onKeyDown);
     return () =>
-      document.removeEventListener('keydown', (e) => {
-        for (let i = 0; i < document.querySelectorAll('.item').length; i++) {
-          if (
-            e.shiftKey &&
-            e.key.toLowerCase() === 'h' &&
-            document.querySelectorAll('.item')[i].style.display !== 'none'
-          ) {
-            document.querySelectorAll('.item')[i].style.display = 'none';
-          } else if (e.shiftKey && e.key.toLowerCase() === 'h')
-            document.querySelectorAll('.item')[i].style.display = 'grid';
-        }
-      });
+      document.removeEventListener(
+        'keydown',
+        onKeyDown
+      );
   }, []);
 
   return (
@@ -147,6 +163,7 @@ function Item(props) {
         canDrop,
         flexStyleX,
         flexStyleY,
+        windowDimensions,
       }}
     >
       <div
@@ -155,13 +172,14 @@ function Item(props) {
         style={x === 'center' ? itemStyleCenter : itemStyle}
         hidden={awkwardLoading}
       >
-        {props.el}
+        {infoExpanded && id !== 'info' ? <></> : props.el}
         {canDrop && (
           <div
             style={{
               fontSize: '0.5em',
               textTransform: 'uppercase',
-              placeSelf: 'center',
+              justifySelf: 'center',
+              alignSelf: 'end',
             }}
           >
             {'> drop here to swap items <'}

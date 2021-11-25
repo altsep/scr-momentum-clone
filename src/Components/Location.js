@@ -20,7 +20,7 @@ function Location() {
         {
           placeSelf: (canDrop || x === 'center') && 'center',
           width:
-            state.loadingImage || canDrop ? '6em' : x === 'center' && '600px',
+            state.loadingImage || canDrop ? '6em' : x === 'center' && '12em',
           textAlign: flexStyleX,
           fontSize: '1em',
           display: 'grid',
@@ -73,8 +73,6 @@ const LocationFull = ({ id, x, state, setQuery, theme, char }) => (
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
-      width: '80%',
-      height: '80%',
     }}
   >
     <NamePlusInput
@@ -122,10 +120,10 @@ const LocationFull = ({ id, x, state, setQuery, theme, char }) => (
             target='_blank'
             rel='noreferrer'
             style={{
-              cursor:
-                state.data.user &&
-                state.data.user.instagram_username &&
-                'pointer',
+              // cursor:
+              //   state.data.user &&
+              //   state.data.user.instagram_username &&
+              //   'pointer',
               textDecoration: 'none',
               color: theme.color,
             }}

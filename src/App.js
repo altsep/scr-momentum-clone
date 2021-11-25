@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Item from './Components/Item';
 import Crypto from './Components/Crypto';
 import Weather from './Components/Weather';
@@ -22,44 +22,50 @@ function App() {
     awkwardLoading,
     unsplashState,
     hoveredState: infoHoveredState,
-  } = React.useContext(Context);
+  } = useContext(Context);
+
+  useEffect(() => {
+    const items = JSON.parse(localStorage.getItem('items'));
+    if (items) {
+      setItemList((state) => {
+        let result = [];
+        items.forEach((a) => result.push(state.find((b) => b.id === a)));
+        return result;
+      });
+    }
+  }, []);
 
   return (
-    <>
-      <div
-        id='main'
-        style={{
-          background: awkwardLoading[0]
-            ? '#fff'
-            : unsplashState.error && '#fcfcfc',
-          color: theme.color,
-          textShadow: theme.textShadow,
-          height: '100vh',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gridTemplateRows: '1fr 1fr 1fr',
-        }}
-      >
-        {itemList
-          .filter((el) =>
-            infoHoveredState[0] === 'expanded' ? el.id === 'info' : el
-          )
-          .map((el, i) => {
-            const pos = getPosition(i);
-            return (
-              <Item
-                el={el.el}
-                id={el.id}
-                setList={setItemList}
-                key={el.id}
-                x={pos.x}
-                y={pos.y}
-              />
-            );
-          })}
-        <Background />
-      </div>
-    </>
+    <div
+      id='main'
+      style={{
+        background: awkwardLoading[0]
+          ? '#fff'
+          : unsplashState.error && '#fafafa',
+        color: theme.color,
+        textShadow: theme.textShadow,
+        height: '100vh',
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gridTemplateRows: '1fr 1fr 1fr',
+      }}
+    >
+      {itemList.map((el, i) => {
+        const pos = getPosition(i);
+        return (
+          <Item
+            el={el.el}
+            id={el.id}
+            setList={setItemList}
+            key={el.id}
+            x={pos.x}
+            y={pos.y}
+            infoExpanded={infoHoveredState[0] === 'expanded'}
+          />
+        );
+      })}
+      <Background />
+    </div>
   );
 }
 

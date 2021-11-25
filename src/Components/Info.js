@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Context } from './Context';
 import styled from 'styled-components';
 import { ItemContext } from './Item';
@@ -6,22 +6,30 @@ import { ItemContext } from './Item';
 function Info() {
   const { theme, themes, hoveredState } = useContext(Context);
 
+  const [infoStatus, setInfoStatus] = hoveredState;
+
+  const { x, y, flexStyleX, canDrop, isDragging, windowDimensions } =
+    useContext(ItemContext);
+
+  useEffect(
+    () => x === 'center' && setInfoStatus('initial'),
+    [setInfoStatus, x]
+  );
+
   const [smallHovered, setSmallHovered] = useState(false);
 
   const [awkwardLoading] = useContext(Context).awkwardLoading;
 
-  const { x, canDrop } = useContext(ItemContext);
-
   return (
     <div
-      className='info container details'
+      className='info-container'
       style={Object.assign(
         {
           zIndex: '1',
           display: awkwardLoading && 'none',
           placeSelf: canDrop && 'center',
         },
-        hoveredState[0] === 'expanded' && {
+        infoStatus === 'expanded' && {
           placeSelf: 'center',
           gridColumn: '1 / 3',
           gridRow: '2 / 3',
@@ -30,152 +38,188 @@ function Info() {
         }
       )}
     >
-      {x === 'center' ? (
-        <InfoCenter
-          theme={theme}
-          themes={themes}
-          hovered={smallHovered}
-          setHovered={setSmallHovered}
-        />
-      ) : hoveredState[0] === 'initial' ? (
+      {x !== 'center' && (
         <InfoSmall
+          x={x}
+          y={y}
+          flexStyleX={flexStyleX}
           theme={theme}
           themes={themes}
           hovered={smallHovered}
           setHovered={setSmallHovered}
-          hoveredState={hoveredState}
+          infoStatus={infoStatus}
+          setInfoStatus={setInfoStatus}
         />
-      ) : (
+      )}
+      {(infoStatus === 'expanded' || x === 'center') && (
         <InfoExtended
+          x={x}
           theme={theme}
           themes={themes}
           hovered={smallHovered}
-          setHovered={setSmallHovered}
+          isDragging={isDragging}
+          canDrop={canDrop}
+          windowDimensions={windowDimensions}
+          infoStatus={infoStatus}
+          awkwardLoading={awkwardLoading}
         />
       )}
     </div>
   );
 }
 
-const InfoSmall = ({ theme, hovered, setHovered, hoveredState }) => (
-  <div
-    className='info title full'
-    style={Object.assign(
-      {
+const InfoSmall = ({
+  x,
+  y,
+  flexStyleX,
+  theme,
+  hovered,
+  setHovered,
+  infoStatus,
+  setInfoStatus,
+}) => {
+  const bgColor =
+    theme.name === 'awkward' ? theme.color + '10' : theme.color + '20';
+  const bgColorHovered =
+    theme.name === 'awkward' ? theme.color + '15' : theme.color + '60';
+  return (
+    <div
+      className='info-title-full'
+      style={Object.assign({
         display: 'grid',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: 35,
-        height: 35,
+        justifyItems: flexStyleX,
+        rowGap: 20,
         fontSize: '1.5rem',
         color: theme.color || '#eae7e1',
-        backgroundColor:
-          theme.name === 'awkward' ? theme.color + '10' : theme.color + '40',
-      },
-      hovered && {
-        fontSize: '1rem',
-        width: 200,
-        height: 150,
-        fontStyle: 'italic',
-        backgroundColor:
-          theme.name === 'awkward' ? theme.color + '15' : theme.color + '60',
-      }
-    )}
-    onMouseEnter={() => setHovered(true)}
-    onMouseLeave={() => setHovered(false)}
-  >
-    {hovered ? (
-      <p
-        className='info link'
-        style={{
-          color: theme.color,
-          textDecoration: 'none',
-          fontSize: '1.2em',
-        }}
-        onMouseEnter={(e) => {
-          hoveredState[1]('expanded');
-        }}
-        onMouseLeave={(e) => {}}
-      >
-        Show more
-      </p>
-    ) : (
-      <p>I</p>
-    )}
-  </div>
-);
-
-const InfoExtended = ({ theme, themes, setHovered }) => (
-  <div
-    className='info extended'
-    style={{
-      position: 'absolute',
-      left: '50%',
-      top: '50%',
-      transform: 'translate(-50%, -50%)',
-      display: 'grid',
-      gridTemplateColumns: '1fr 80px',
-      gridTemplateRows: 'repeat(auto, 1fr)',
-      columnGap: 50,
-      rowGap: 20,
-      fontSize: '0.9em',
-      width: 600,
-      color: theme.color || '#eae7e1',
-      backgroundColor:
-        theme.name === 'awkward'
-          ? theme.color + '20'
-          : themes.awkward.color + '9f',
-      padding: 50,
-    }}
-  >
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-      }}
+        cursor: 'pointer',
+      })}
     >
-      <h4 className='title' style={{ marginBottom: 20 }}>
-        Features:
-      </h4>
-      <ControlsListContainer className='controls-list' theme={theme}>
+      {hovered && (
+        <p
+          className='info-link'
+          style={{
+            color: hovered ? theme.color + 'ff' : theme.color,
+            fontSize: '0.8em',
+            cursor: 'pointer',
+            fontStyle: 'italic',
+            backgroundColor: hovered ? bgColorHovered : bgColor,
+            padding: 15,
+            marginRight: x === 'right' && 55,
+            marginLeft: x === 'left' && 55,
+            order: y === 'top' && 1,
+          }}
+        >
+          {infoStatus === 'initial' ? 'Display info...' : 'Return'}
+        </p>
+      )}
+      <p
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: 35,
+          height: 35,
+          backgroundColor: hovered ? bgColorHovered : bgColor,
+          textDecoration: hovered && 'underline',
+        }}
+        onClick={() => {
+          setInfoStatus((state) =>
+            state === 'initial' ? 'expanded' : 'initial'
+          );
+        }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        I
+      </p>
+    </div>
+  );
+};
+
+const InfoExtended = ({
+  x,
+  theme,
+  themes,
+  isDragging,
+  canDrop,
+  windowDimensions,
+  infoStatus,
+  awkwardLoading
+}) => {
+  const bgColor =
+    theme.name === 'awkward' ? theme.color + '20' : themes.awkward.color + '9f';
+
+  const [scroll, setScroll] = useState(true);
+
+  useEffect(() => {
+    const el = document.querySelector('.controls-list');
+    if (el) {
+      console.log(el.scrollHeight, el.clientHeight)
+      setScroll(el.scrollHeight > el.clientHeight);
+    }
+  }, []);
+
+  useEffect(() => {
+    const el = document.querySelector('.controls-list');
+    if (!awkwardLoading && el) {
+      setScroll(el.scrollHeight > el.clientHeight);
+      window.addEventListener('resize', () => {
+        setScroll(el.scrollHeight > el.clientHeight);
+      });
+    }
+    return () =>
+      window.removeEventListener('resize', () =>
+        setScroll(el.scrollHeight > el.clientHeight)
+      );
+  }, [awkwardLoading]);  
+
+  return (
+    <div
+      className='info-extended'
+      style={Object.assign(
+        {
+          display: isDragging ? 'none' : 'grid',
+          rowGap: 20,
+          fontSize: '0.9em',
+          minWidth: '20rem',
+          maxWidth: '40rem',
+          gridColumn: '',
+          color: theme.color || '#eae7e1',
+          backgroundColor: canDrop ? '#00000000' : bgColor,
+          padding: canDrop ? 0 : windowDimensions.height < 920 ? 5 : 50,
+          borderRadius: canDrop ? 0 : 20,
+          // overflowY: scroll ? 'scroll' : 'hidden',
+        },
+        x !== 'center' && {
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
+        }
+      )}
+    >
+      <h4 className='title'>Features:</h4>
+      <ControlsListContainer
+        className='controls-list details'
+        x={x}
+        theme={theme}
+        windowHeight={windowDimensions.height}
+        scroll={scroll}
+        infoStatus={infoStatus}
+      >
         <ControlsList />
       </ControlsListContainer>
     </div>
-    <Back setHovered={setHovered} theme={theme} />
-  </div>
-);
-
-const InfoCenter = ({ theme, themes }) => (
-  <div
-    className='info center'
-    style={{
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-around',
-      fontSize: '0.9em',
-      height: '100%',
-      width: 600,
-      color: theme.color,
-      backgroundColor:
-        theme.name === 'awkward'
-          ? theme.color + '20'
-          : themes.awkward.color + '9f',
-      padding: 50,
-    }}
-  >
-    <h4 className='title'>Features:</h4>
-    <ControlsListContainer className='controls-list' theme={theme}>
-      <ControlsList />
-    </ControlsListContainer>
-  </div>
-);
+  );
+};
 
 const ControlsListContainer = styled.ul`
   display: grid;
-  grid-template-rows: repeat(auto, 1fr);
   row-gap: 10px;
   line-height: 1.8;
+  max-height: ${({ infoStatus, windowHeight }) =>
+    infoStatus === 'expanded' ? '50vh' : windowHeight < 920 ? '34vh' : '40vh'};
+  overflow-y: ${({ scroll }) => (scroll ? 'scroll' : 'hidden')};
 
   & > li {
     border-bottom: ${({ theme }) => theme.border};
@@ -184,8 +228,10 @@ const ControlsListContainer = styled.ul`
 
 const ControlsList = () => (
   <>
-    <li>drag to and place items in one of the designated areas</li>
-    <li>swap position of items by dragging and dropping one of them</li>
+    <li>
+      drag to and place items in one of the designated areas, swapping their
+      position
+    </li>
     <li>
       change background image by either double clicking on parts of screen that
       are empty or by double pressing the 'b' key
@@ -202,43 +248,5 @@ const ControlsList = () => (
     <li>use 'shift + h' to hide all elements</li>
   </>
 );
-
-const Back = ({ setHovered, theme }) => {
-  const { hoveredState } = useContext(Context);
-  return (
-    <div
-      style={{
-        alignSelf: 'center',
-        border: theme.border,
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: 80,
-        width: 80,
-      }}
-      onMouseEnter={() => {
-        hoveredState[1]('initial');
-        setHovered(false);
-      }}
-    >
-      <svg
-        xmlns='http://www.w3.org/2000/svg'
-        className='h-6 w-6'
-        fill='none'
-        viewBox='0 0 24 24'
-        stroke='currentColor'
-        style={{ height: 40, width: 40 }}
-      >
-        <path
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          strokeWidth={2}
-          d='M15 19l-7-7 7-7'
-        />
-      </svg>
-    </div>
-  );
-};
 
 export default Info;

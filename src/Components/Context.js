@@ -8,9 +8,7 @@ const Provider = (props) => {
     'https://apis.scrimba.com/unsplash/photos/random?orientation=landscape' +
     (unsplashName.length > 0 ? `&query=${unsplashName}` : '');
   const { state: unsplashState, handleBool: handleUnsplashBool } =
-    useFetch(
-      unsplashUrl
-      );
+    useFetch(unsplashUrl);
 
   // fetch crypto
   const cryptoUrl = (name) =>
