@@ -17,12 +17,8 @@ function App() {
     { id: 'info', el: <Info /> },
   ]);
 
-  const {
-    theme,
-    awkwardLoading,
-    unsplashState,
-    hoveredState: infoHoveredState,
-  } = useContext(Context);
+  const { theme, awkwardLoading, unsplash, infoStatus, windowDimensions } =
+    useContext(Context);
 
   useEffect(() => {
     const items = JSON.parse(localStorage.getItem('items'));
@@ -38,17 +34,7 @@ function App() {
   return (
     <div
       id='main'
-      style={{
-        background: awkwardLoading[0]
-          ? '#fff'
-          : unsplashState.error && '#fafafa',
-        color: theme.color,
-        textShadow: theme.textShadow,
-        height: '100vh',
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gridTemplateRows: '1fr 1fr 1fr',
-      }}
+      style={mainStyle(theme, awkwardLoading, unsplash, windowDimensions)}
     >
       {itemList.map((el, i) => {
         const pos = getPosition(i);
@@ -56,11 +42,12 @@ function App() {
           <Item
             el={el.el}
             id={el.id}
+            i={i}
             setList={setItemList}
             key={el.id}
             x={pos.x}
             y={pos.y}
-            infoExpanded={infoHoveredState[0] === 'expanded'}
+            infoExpanded={infoStatus === 'expanded'}
           />
         );
       })}
@@ -68,6 +55,29 @@ function App() {
     </div>
   );
 }
+
+const mainStyle = (theme, awkwardLoading, unsplash, window) =>
+  Object.assign(
+    {
+      background: awkwardLoading[0] ? '#fff' : unsplash.error && '#fafafa',
+      color: theme.color,
+      textShadow: theme.textShadow,
+      height: '100vh',
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gridTemplateRows: '1fr 1fr 1fr',
+    },
+    window.width < 700 && {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    window.height < 720 && {
+      display: 'flex',
+      flexDirection: 'row',
+    }
+  );
 
 const getPosition = (i) => {
   switch (i) {
@@ -82,7 +92,7 @@ const getPosition = (i) => {
     case 4:
       return { x: 'right', y: 'bottom' };
     default:
-      return { x: 'center', y: 'center' };
+      return { x: 'initial', y: 'initial' };
   }
 };
 

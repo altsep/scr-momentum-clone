@@ -11,10 +11,10 @@ function Crypto() {
     cryptoState: state,
     handleCryptoBool: handleBool,
     theme,
-    cryptoName,
+    cryptoName: [cryptoName, setCryptoName],
   } = useContext(Context);
 
-  const { id, x, canDrop, flexStyleX } = useContext(ItemContext);
+  const { id, x, canDrop, flexStyleX, flexStyleY, windowSmall } = useContext(ItemContext);
 
   const loaderText = useLoaderText(state.loading, x === 'center' && '1.4em');
 
@@ -36,13 +36,7 @@ function Crypto() {
   const { ErrorMessage, errorDisplay } = useErrorMessage(state);
 
   return (
-    <div
-      id='crypto'
-      style={{
-        placeSelf: (canDrop || x === 'center') && 'center',
-        display: 'grid',
-      }}
-    >
+    <>
       {state.loading
         ? loaderText
         : state.data &&
@@ -51,7 +45,7 @@ function Crypto() {
             <div
               className='crypto-center'
               style={{
-                placeSelf: 'center',
+                placeSelf: (canDrop || x === 'center') && 'center',
                 display: 'grid',
                 gridTemplateColumns: '1fr 50px',
                 gridTemplateRows: '2fr 1fr',
@@ -91,7 +85,7 @@ function Crypto() {
                   id={id}
                   x={x}
                   state={state}
-                  setQuery={cryptoName[1]}
+                  setQuery={setCryptoName}
                   titleText={state.data.name}
                   theme={theme}
                   char='c'
@@ -181,6 +175,8 @@ function Crypto() {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: flexStyleX,
+                justifyContent: flexStyleY,
+                transform: windowSmall && 'scale(1.4)',
               }}
             >
               <div
@@ -188,7 +184,7 @@ function Crypto() {
                 style={{
                   display: 'flex',
                   flexDirection: 'row',
-                  justifyContent: flexStyleX,
+                  justifyContent: flexStyleY,
                   alignItems: 'center',
                 }}
                 onMouseEnter={() => handleHovered('logo', true)}
@@ -217,7 +213,7 @@ function Crypto() {
                   id={id}
                   x={x}
                   state={state}
-                  setQuery={cryptoName[1]}
+                  setQuery={setCryptoName}
                   titleText={state.data.name}
                   theme={theme}
                   char='c'
@@ -236,6 +232,7 @@ function Crypto() {
                   hovered={hovered}
                   x={x}
                   currencyName={state.data.id}
+                  windowSmall={windowSmall}
                 />
               </div>
             </div>
@@ -247,7 +244,7 @@ function Crypto() {
           style={{ marginTop: state.data ? 10 : '', justifySelf: flexStyleX }}
         />
       )}
-    </div>
+    </>
   );
 }
 
@@ -270,7 +267,7 @@ const Logo = ({ state, handleBool, hovered, size, x }) => (
   />
 );
 
-const Details = ({ state, handleHovered, hovered, x, currencyName }) => {
+const Details = ({ state, handleHovered, hovered, x, currencyName, windowSmall }) => {
   return (
     <div
       style={{
@@ -326,7 +323,7 @@ const Details = ({ state, handleHovered, hovered, x, currencyName }) => {
           gridRow: '1 / 2',
           isplay: 'flex',
           flexDirection: 'column',
-          opacity: hovered.details ? 0.8 : 0,
+          opacity: hovered.details || windowSmall ? 0.8 : 0,
         }}
       >
         <p>Current</p>

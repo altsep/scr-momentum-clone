@@ -5,7 +5,7 @@ import { useLoaderText } from '../Hooks/useLoaderText';
 
 function Background() {
   const [url, setUrl] = useState();
-  const { unsplashState: state, handleUnsplashBool: handleBool } =
+  const { unsplash: state, handleUnsplashBool: handleBool } =
     useContext(Context);
 
   // Urls object keys:
@@ -68,14 +68,6 @@ function Background() {
       document.removeEventListener('keyup', onKeyUp);
     };
   }, []);
-
-  // useEffect(() => {
-  //   if (doublePress) {
-  //     handleBool('active', null, true);
-  //     setDoublePress(false);
-  //   }
-  //   console.log(doublePress);
-  // }, [doublePress, handleBool]);
 
   return (
     <>
@@ -155,6 +147,7 @@ function Background() {
             objectFit: 'cover',
             width: '100%',
             height: '100%',
+            userSelect: 'none',
           }}
         >
           （゜;﹏;゜）

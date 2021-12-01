@@ -12,20 +12,6 @@ body {
 
 .item > div {
   margin: 10px;
-  overflow: hidden
-}
-
-.title {
-  overflow: visible
-}
-
-/* .item.center > div {
-  overflow: scroll;
-} */
-
-.item > #date-container {
-  margin: 0;
-  overflow: visible;
 }
 
 .item:hover {
@@ -38,20 +24,13 @@ body {
   padding: 0;
 }
 
-/* .item.info.center {
-  overflow: hidden
-} */
-
 .title {
   font-family: 'Merriweather', sans-serif;
   letter-spacing: 0.1rem;
 }
 
 input:focus {
-  border: 1px solid;
   opacity: 0.9;
-  writing-mode: vertical-rl;
-  text-orientation: sideways;
 }
 
 input::placeholder {
@@ -86,7 +65,7 @@ input::placeholder {
 }
 
 .crypto-icon-link {
-  padding: 10px
+  padding: 10px;
 }
 
 .crypto-icon-link:hover {
@@ -94,9 +73,23 @@ input::placeholder {
   border-radius: 100%;
 }
 
+@media (max-height: 720px) and (max-width: 700px) {
+  .item > div {
+    margin: 0;
+  }
+}
 
 @media (max-height: 650px) {
   .item.center:hover {
     padding: 0;
+  }
+}
+
+@media (max-width: 960px) {
+  .item > div {
+    overflow: hidden;
+  }
+  .name-hidden-input {
+    outline: none;
   }
 }

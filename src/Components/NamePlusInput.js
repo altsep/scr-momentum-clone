@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const NamePlusInput = ({ id, x, state, setQuery, titleText, theme, char }) => {
   const [titleName, setTitleName] = useState(titleText);
-
   const [titleValue, setTitleValue] = useState(titleName || '');
 
   useEffect(
@@ -23,7 +22,7 @@ const NamePlusInput = ({ id, x, state, setQuery, titleText, theme, char }) => {
         setTitleDisplay('block');
       } else setTitleDisplay('none');
     if (inputRef.current !== null) {
-      setInputDisplay('block');
+      setInputDisplay('flex');
       setTimeout(() => inputRef.current.focus(), 1);
     }
   };
@@ -54,7 +53,7 @@ const NamePlusInput = ({ id, x, state, setQuery, titleText, theme, char }) => {
     inputRef.current.blur();
   };
 
-  // Some positional gimmicks for crypto center.
+  // Crypto center positioning
   const [inputPos, setInputPos] = useState(0);
 
   useEffect(() => {
@@ -90,19 +89,10 @@ const NamePlusInput = ({ id, x, state, setQuery, titleText, theme, char }) => {
       >
         {titleName}
       </p>
-      <input
-        className='name-hidden-input'
-        ref={inputRef}
+      <div
         style={Object.assign(
           {
-            display: inputDisplay,
-            color: theme.color,
-            textShadow: theme.textShadow,
-            border: '0px',
-            borderColor: !theme.color,
-            fontSize: '1.5rem',
-            width: '10em',
-            background: 'transparent',
+            display: 'flex',
           },
           id === 'crypto' &&
             x === 'center' && {
@@ -110,29 +100,65 @@ const NamePlusInput = ({ id, x, state, setQuery, titleText, theme, char }) => {
               top: inputPos ? inputPos - 45 : undefined,
               left: '50%',
               transform: 'translateX(-50%)',
+              writingMode: 'horizontal-tb',
             }
         )}
-        type='text'
-        name='name'
-        value={titleValue}
-        placeholder='Input request...'
-        onChange={(e) => setTitleValue(e.target.value)}
-        onFocus={() => {
-          setTitleValue('');
-        }}
-        onBlur={(e) => {
-          setTitleValue(titleName);
-          // e.target.style.display = 'none';
-          // titleRef.current.style.display = 'block';
-          setInputDisplay('none');
-          setTitleDisplay('block');
-        }}
-        onKeyDown={(e) => {
-          e.key === 'Enter'
-            ? handleSubmit(e)
-            : e.key === 'Escape' && inputRef.current.blur();
-        }}
-      />
+      >
+        <input
+          className='name-hidden-input'
+          style={{
+            display: inputDisplay,
+            color: theme.color,
+            textShadow: theme.textShadow,
+            border: 'none',
+            fontSize: '1.5rem',
+            height: '1.75rem',
+            maxWidth: '10rem',
+            background: 'transparent',
+          }}
+          ref={inputRef}
+          type='text'
+          name='name'
+          value={titleValue}
+          placeholder='Input request...'
+          onChange={(e) => setTitleValue(e.target.value)}
+          onKeyDown={(e) => {
+            e.key === 'Enter'
+              ? handleSubmit(e)
+              : e.key === 'Escape' && inputRef.current.blur();
+          }}
+          onFocus={() => {
+            setTitleValue('');
+          }}
+          onBlur={(e) => {
+            // e.target.style.display = 'none';
+            // titleRef.current.style.display = 'block';
+            setInputDisplay('none');
+            setTitleDisplay('block');
+          }}
+        />
+        <button
+          className='name-hidden-input__button'
+          type='submit'
+          style={{
+            display: inputDisplay,
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontSize: '0.75rem',
+            height: '1.75rem',
+            marginLeft: 2,
+            textTransform: 'uppercase',
+            fontWeight: '600',
+            letterSpacing: 1.15,
+            padding: '0 0.25rem',
+            color: theme.color + 'f0',
+            backgroundColor: theme.color + '50',
+          }}
+          onMouseDown={handleSubmit}
+        >
+          Send
+        </button>
+      </div>
     </div>
   );
 };

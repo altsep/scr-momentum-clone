@@ -19,7 +19,7 @@ function Weather() {
 
   const [cityName, setCityName] = cityNameState;
 
-  const { id, x, y, isDragging, canDrop, flexStyleX, flexStyleY } =
+  const { id, x, y, isDragging, canDrop, flexStyleX, flexStyleY, windowSmall } =
     useContext(ItemContext);
 
   const { ErrorMessage, setErrorText, errorDisplay } = useErrorMessage(state);
@@ -55,6 +55,13 @@ function Weather() {
   }, []);
 
   const [units, setUnits] = useState('imperial');
+
+  useEffect(() => {
+    const item = localStorage.getItem('weatherSwitchTo');
+    item && setUnits(item);
+  }, []);
+
+  useEffect(() => localStorage.setItem('weatherSwitchTo', units), [units]);
 
   useEffect(() => {
     cityName.length > 0
@@ -96,11 +103,31 @@ function Weather() {
     state.data && state.data.name && handleBool('error', false);
   }, []);
 
+  const [values, setValues] = useState({ temp: '', feels: '', wind: '' });
+
+  useEffect(() => {
+    const tempText = units === 'imperial' ? '°C' : '°F';
+    const windText = units === 'imperial' ? 'm/s' : 'mph';
+    state.data &&
+      setValues({
+        temp: /\.0$/.test(state.data.main.temp.toFixed(1))
+          ? Math.round(state.data.main.temp) + tempText
+          : state.data.main.temp.toFixed(1) + tempText,
+        feels: /\.0$/.test(state.data.main.feels_like.toFixed(1))
+          ? Math.round(state.data.main.feels_like) + tempText
+          : state.data.main.feels_like.toFixed(1) + tempText,
+        wind: state.data.wind.speed.toFixed() + windText,
+      });
+  }, [state, units]);
+
   const propsMain = {
     id,
     x,
     state,
     text: units,
+    temp: values.temp,
+    feels: values.feels,
+    wind: values.wind,
     theme,
     flexStyleX,
     flexStyleY,
@@ -108,6 +135,7 @@ function Weather() {
     setQuery: setCityName,
     char: 'w',
     handleClick: handleClick,
+    windowSmall,
   };
 
   return (
@@ -119,6 +147,7 @@ function Weather() {
         placeSelf: (canDrop || x === 'center') && 'center',
         justifyContent: flexStyleY,
         alignItems: flexStyleX,
+        transform: windowSmall && 'scale(1.4)',
       }}
     >
       <div
@@ -146,7 +175,7 @@ function Weather() {
             ) : (
               <WeatherSmall props={propsMain} />
             ))}
-        {!isDragging && !canDrop && state.data && (
+        {!isDragging && !canDrop && !windowSmall && state.data && (
           <ControlsSwitch
             props={{
               id,
@@ -181,7 +210,9 @@ function Weather() {
 const WeatherFull = ({ props }) => {
   const {
     state,
-    text,
+    temp,
+    feels,
+    wind,
     x,
     flexStyleX,
     flexStyleY,
@@ -196,7 +227,7 @@ const WeatherFull = ({ props }) => {
     <div
       className='weather'
       style={{
-        width: '18em',
+        width: '19em',
         display: 'flex',
         flexDirection: 'row',
         justifyContent: flexStyleX,
@@ -221,8 +252,7 @@ const WeatherFull = ({ props }) => {
           }}
           onClick={handleClick}
         >
-          {state.data.main.temp.toFixed(1) +
-            (text === 'imperial' ? '°C' : '°F')}
+          {temp}
         </p>
         <div
           className='weather details'
@@ -235,8 +265,7 @@ const WeatherFull = ({ props }) => {
           onClick={handleClick}
         >
           Feels like&nbsp;
-          {state.data.main.feels_like.toFixed(1) +
-            (text === 'imperial' ? '°C' : '°F')}
+          {feels}
         </div>
         <div
           className='weather border-line'
@@ -288,10 +317,7 @@ const WeatherFull = ({ props }) => {
         >
           {state.data.weather[0].description}
         </p>
-        <p>
-          {state.data.wind.speed.toFixed()}
-          {text === 'imperial' ? 'm/s' : 'mph'}
-        </p>
+        <p>{wind}</p>
         <p>{state.data.main.humidity}%</p>
         <p>{state.data.main.pressure}hPa</p>
       </div>
@@ -302,7 +328,8 @@ const WeatherFull = ({ props }) => {
 const WeatherSmall = ({ props }) => {
   const {
     state,
-    text,
+    temp,
+    wind,
     x,
     flexStyleX,
     flexStyleY,
@@ -312,12 +339,13 @@ const WeatherSmall = ({ props }) => {
     theme,
     char,
     handleClick,
+    windowSmall,
   } = props;
   return (
     <div
       className='weather'
       style={{
-        width: '7em',
+        width: windowSmall ? '100%' : '7em',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: flexStyleY,
@@ -357,18 +385,12 @@ const WeatherSmall = ({ props }) => {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: flexStyleY,
-            alignItems: flexStyleX,
+            alignItems: windowSmall ? 'flex-start' : flexStyleX,
           }}
         >
-          <p>
-            {state.data.main.temp.toFixed(1) +
-              (text === 'imperial' ? '°C' : '°F')}
-          </p>
+          <p>{temp}</p>
           <p>{state.data.weather[0].main}</p>
-          <p>
-            {state.data.wind.speed.toFixed() +
-              (text === 'imperial' ? 'm/s' : 'mph')}
-          </p>
+          <p>{wind}</p>
         </div>
       </div>
     </div>

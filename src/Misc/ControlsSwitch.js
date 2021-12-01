@@ -1,13 +1,5 @@
 const ControlsSwitch = ({ props }) => {
-  const {
-    x,
-    y,
-    setActive,
-    hover,
-    text,
-    icon,
-    handleClick,
-  } = props;
+  const { id, x, setActive, hover, text, icon, handleClick } = props;
 
   return (
     <div
@@ -16,7 +8,7 @@ const ControlsSwitch = ({ props }) => {
         {
           margin: x === 'center' ? '40px 0 0' : 10,
           order: x === 'right' && -1,
-          alignSelf: y === 'top' ? 'start' : y === 'bottom' ? 'end' : 'center',
+          alignSelf: id === 'weather' && x !== 'center' ? 'end' : 'center',
         },
         {
           display: 'flex',

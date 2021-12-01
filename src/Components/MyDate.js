@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { Context } from './Context';
 import { ItemContext } from './Item';
 import ControlsSwitch from '../Misc/ControlsSwitch';
 import { IconSwitch } from '../Misc/Icons';
@@ -26,8 +27,9 @@ function MyDate() {
     }
   }, [data]);
 
-  const { id, x, y, flexStyleX, isDragging, canDrop } = useContext(ItemContext);
-  const dateSize = 2.5;
+  const { windowDimensions } = useContext(Context);
+  const { id, x, y, flexStyleX, isDragging, canDrop, windowSmall } =
+    useContext(ItemContext);
 
   // Handle controls
   const [text, setText] = useState('date');
@@ -47,17 +49,27 @@ function MyDate() {
     return () => document.removeEventListener('keydown', onKeyDown);
   }, []);
 
+  useEffect(() => {
+    const item = localStorage.getItem('dateSwitchTo');
+    item && setText(item);
+  }, []);
+
+  useEffect(() => localStorage.setItem('dateSwitchTo', text), [text]);
+
   return (
     <div
       id='date-container'
       style={{
         placeSelf: (canDrop || x === 'center') && 'center',
-        fontSize: x === 'center' ? `${dateSize * 2}em` : `${dateSize}em`,
+        fontSize: x === 'center' ? '5em' : '2.5em',
         userSelect: 'none',
         display: 'flex',
         flexDirection: x === 'center' ? 'column' : 'row',
         justifyContent: 'center',
         alignItems: 'center',
+        transform: windowSmall && 'scale(1.2)',
+        width: windowDimensions.height < 720 && '3em',
+        margin: windowSmall && 0,
       }}
       onClick={handleClick}
       onMouseDown={() => setActive(true)}
@@ -80,7 +92,7 @@ function MyDate() {
           flexStyleX={flexStyleX}
         />
       )}
-      {!isDragging && !canDrop && (
+      {!isDragging && !canDrop && !windowSmall && (
         <ControlsSwitch
           props={{
             id,

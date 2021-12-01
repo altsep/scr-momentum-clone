@@ -6,7 +6,10 @@ import { useErrorMessage } from '../Hooks/useErrorMessage';
 import NamePlusInput from './NamePlusInput';
 
 function Location() {
-  const { unsplashState: state, setUnsplashName } = useContext(Context);
+  const {
+    unsplash: state,
+    unsplashName: [unsplashName, setUnsplashName],
+  } = useContext(Context);
   const { id, x, canDrop, flexStyleX } = useContext(ItemContext);
   const loaderText = useLoaderText(state.loadingImage, x === 'center' && '1em');
   const { theme } = useContext(Context);
@@ -120,10 +123,6 @@ const LocationFull = ({ id, x, state, setQuery, theme, char }) => (
             target='_blank'
             rel='noreferrer'
             style={{
-              // cursor:
-              //   state.data.user &&
-              //   state.data.user.instagram_username &&
-              //   'pointer',
               textDecoration: 'none',
               color: theme.color,
             }}
@@ -149,16 +148,23 @@ const LocationFull = ({ id, x, state, setQuery, theme, char }) => (
           </div>
         </div>
       </div>
-      <img
+      <a
+        href={
+          state.data.user.instagram_username
+            ? `https://www.instagram.com/${state.data.user.instagram_username}`
+            : undefined
+        }
+        target='_blank'
+        rel='noreferrer'
         style={{
           gridColumn: '2 / 3',
           gridRow: '2 / 3',
           opacity: 0.8,
           marginLeft: 20,
         }}
-        src={state.data.user.profile_image.medium}
-        alt=''
-      />
+      >
+        <img src={state.data.user.profile_image.medium} alt='' />
+      </a>
     </div>
   </div>
 );

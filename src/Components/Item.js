@@ -7,7 +7,7 @@ const ItemTypes = {
 };
 
 function Item(props) {
-  const { x, y, id, infoExpanded } = props;
+  const { x, y, id, i, el, infoExpanded } = props;
 
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.item,
@@ -52,28 +52,22 @@ function Item(props) {
   const dragDropRef = drag(drop(ref));
 
   //----
-  const [awkwardLoading] = useContext(Context).awkwardLoading;
+  const {
+    windowDimensions: { width, height },
+    awkwardLoading: [awkwardLoading],
+    theme,
+  } = useContext(Context);
 
   const [itemsHidden, setItemsHidden] = React.useState(false);
 
-  const [windowDimensions, setWindowDimensions] = useState({
-    width: 0,
-    height: 0,
-  });
-
-  useEffect(() => {
-    setDimensions();
-    window.addEventListener('resize', () => setDimensions());
-    return () => window.removeEventListener('resize', () => setDimensions());
-  }, []);
-
-  useEffect(() => setDimensions(), [infoExpanded]);
-
-  const setDimensions = () =>
-    setWindowDimensions({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
+  const [windowSmall, setWindowSmall] = useState(false);
+  useEffect(
+    () =>
+      width < 700 || height < 720
+        ? setWindowSmall(true)
+        : setWindowSmall(false),
+    [width, height]
+  );
 
   const itemStyle = Object.assign(
     {
@@ -81,8 +75,7 @@ function Item(props) {
       opacity: (isDragging || isOver) && 0.5,
       border: isDragging
         ? 'none'
-        : canDrop &&
-          document.getElementById('main').style.color === 'rgb(43, 43, 43)'
+        : canDrop && theme.name === 'awkward'
         ? '2px dashed #2b2b2b'
         : canDrop && '2px dashed #eaeaea',
       justifySelf: x === 'left' ? 'start' : 'end',
@@ -107,18 +100,14 @@ function Item(props) {
       opacity: (isDragging || isOver) && 0.5,
       border: isDragging
         ? 'none'
-        : canDrop &&
-          document.getElementById('main').style.color === 'rgb(43, 43, 43)'
+        : canDrop && theme.name === 'awkward'
         ? '2px dashed #2b2b2b'
         : canDrop && '2px dashed #eaeaea',
       gridColumn: '1 / 3',
       gridRow: '2 / 3',
       placeSelf: 'center',
       zIndex: '1',
-      display:
-        awkwardLoading || itemsHidden || windowDimensions.height < 720
-          ? 'none'
-          : 'grid',
+      display: awkwardLoading || itemsHidden ? 'none' : 'grid',
       maxWidth: window.innerWidth - 24,
       maxHeight: '95%',
       borderRadius: 20,
@@ -136,6 +125,64 @@ function Item(props) {
     }
   );
 
+  const itemStyleMedia = Object.assign(
+    {
+      opacity: (isDragging || isOver) && 0.5,
+      zIndex: '1',
+      display: awkwardLoading || itemsHidden ? 'none' : 'grid',
+      placeItems: 'center',
+      backgroundColor: infoExpanded && '#00000000',
+      maxWidth: window.innerWidth - 24,
+    },
+    canDrop && {
+      borderTopWidth: '2px',
+      borderLeftWidth: '2px',
+      borderRightWidth: '2px',
+      borderBottomWidth: '2px',
+      borderTopStyle: 'dashed',
+      borderLeftStyle: 'dashed',
+      borderRightStyle: 'dashed',
+      borderBottomStyle: 'dashed',
+      borderColor: theme.name === 'awkward' ? '#2b2b2b' : '#eaeaea',
+      borderRadius: 0,
+      height: '100%',
+      width: '100%',
+    },
+    isDragging && {
+      transform: 'scale(0.9)',
+      borderTopStyle: 'none',
+      borderLeftStyle: 'none',
+      borderRightStyle: 'none',
+      borderBottomStyle: 'none',
+    },
+    windowSmall &&
+      (id === 'info' || id === 'location') && {
+        display: 'none',
+      },
+    windowSmall && {
+      backgroundColor: '#00000044',
+      margin: 0,
+      padding: 0,
+    },
+    height < 720
+      ? {
+          width: width / 3,
+          height: '100%',
+          borderLeftWidth: i === 1 || i === 2 ? '1px' : '0',
+          borderLeftStyle: canDrop ? 'dashed' : 'solid',
+          borderRightWidth: i === 0 || i === 1 ? '1px' : '0',
+          borderRightStyle: canDrop ? 'dashed' : 'solid',
+        }
+      : width < 700 && {
+          width: '100%',
+          height: height / 3,
+          borderTopWidth: i === 1 || i === 2 ? '1px' : '0',
+          borderTopStyle: canDrop ? 'dashed' : 'solid',
+          borderBottomWidth: i === 0 || i === 1 ? '1px' : '0',
+          borderBottomStyle: canDrop ? 'dashed' : 'solid',
+        }
+  );
+
   const flexStyleX = x === 'left' ? 'start' : x === 'center' ? 'center' : 'end';
   const flexStyleY = y === 'top' ? 'start' : x === 'center' ? 'center' : 'end';
 
@@ -146,33 +193,35 @@ function Item(props) {
       e.key.toLowerCase() === 'h' &&
       setItemsHidden((state) => !state);
     document.addEventListener('keydown', onKeyDown);
-    return () =>
-      document.removeEventListener(
-        'keydown',
-        onKeyDown
-      );
+    return () => document.removeEventListener('keydown', onKeyDown);
   }, []);
 
   return (
     <ItemProvider
       value={{
-        x,
-        y,
+        x: windowSmall ? 'initial' : x,
+        y: windowSmall ? 'initial' : y,
         id,
         isDragging,
         canDrop,
-        flexStyleX,
-        flexStyleY,
-        windowDimensions,
+        flexStyleX: windowSmall ? 'center' : flexStyleX,
+        flexStyleY: windowSmall ? 'center' : flexStyleY,
+        windowSmall,
       }}
     >
       <div
         className={`item ${id} ${x}`}
         ref={dragDropRef}
-        style={x === 'center' ? itemStyleCenter : itemStyle}
+        style={
+          windowSmall
+            ? itemStyleMedia
+            : x === 'center'
+            ? itemStyleCenter
+            : itemStyle
+        }
         hidden={awkwardLoading}
       >
-        {infoExpanded && id !== 'info' ? <></> : props.el}
+        {infoExpanded && id !== 'info' ? <></> : el}
         {canDrop && (
           <div
             style={{

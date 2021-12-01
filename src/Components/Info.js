@@ -4,12 +4,10 @@ import styled from 'styled-components';
 import { ItemContext } from './Item';
 
 function Info() {
-  const { theme, themes, hoveredState } = useContext(Context);
+  const { theme, themes, infoStatus, setInfoStatus, windowDimensions } =
+    useContext(Context);
 
-  const [infoStatus, setInfoStatus] = hoveredState;
-
-  const { x, y, flexStyleX, canDrop, isDragging, windowDimensions } =
-    useContext(ItemContext);
+  const { x, y, flexStyleX, canDrop, isDragging } = useContext(ItemContext);
 
   useEffect(
     () => x === 'center' && setInfoStatus('initial'),
@@ -91,8 +89,8 @@ const InfoSmall = ({
         rowGap: 20,
         fontSize: '1.5rem',
         color: theme.color || '#eae7e1',
-        cursor: 'pointer',
       })}
+      onMouseLeave={() => setHovered(false)}
     >
       {hovered && (
         <p
@@ -100,7 +98,6 @@ const InfoSmall = ({
           style={{
             color: hovered ? theme.color + 'ff' : theme.color,
             fontSize: '0.8em',
-            cursor: 'pointer',
             fontStyle: 'italic',
             backgroundColor: hovered ? bgColorHovered : bgColor,
             padding: 15,
@@ -121,14 +118,15 @@ const InfoSmall = ({
           height: 35,
           backgroundColor: hovered ? bgColorHovered : bgColor,
           textDecoration: hovered && 'underline',
+          cursor: 'pointer',
         }}
         onClick={() => {
           setInfoStatus((state) =>
             state === 'initial' ? 'expanded' : 'initial'
           );
         }}
-        onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
+        onMouseEnter={() => setHovered(true)}
       >
         I
       </p>
@@ -144,25 +142,17 @@ const InfoExtended = ({
   canDrop,
   windowDimensions,
   infoStatus,
-  awkwardLoading
+  awkwardLoading,
 }) => {
   const bgColor =
     theme.name === 'awkward' ? theme.color + '20' : themes.awkward.color + '9f';
 
-  const [scroll, setScroll] = useState(true);
-
-  useEffect(() => {
-    const el = document.querySelector('.controls-list');
-    if (el) {
-      console.log(el.scrollHeight, el.clientHeight)
-      setScroll(el.scrollHeight > el.clientHeight);
-    }
-  }, []);
+  const [scroll, setScroll] = useState(false);
 
   useEffect(() => {
     const el = document.querySelector('.controls-list');
     if (!awkwardLoading && el) {
-      setScroll(el.scrollHeight > el.clientHeight);
+      setTimeout(() => setScroll(el.scrollHeight > el.clientHeight), 1);
       window.addEventListener('resize', () => {
         setScroll(el.scrollHeight > el.clientHeight);
       });
@@ -171,7 +161,7 @@ const InfoExtended = ({
       window.removeEventListener('resize', () =>
         setScroll(el.scrollHeight > el.clientHeight)
       );
-  }, [awkwardLoading]);  
+  }, [awkwardLoading]);
 
   return (
     <div
@@ -188,7 +178,7 @@ const InfoExtended = ({
           backgroundColor: canDrop ? '#00000000' : bgColor,
           padding: canDrop ? 0 : windowDimensions.height < 920 ? 5 : 50,
           borderRadius: canDrop ? 0 : 20,
-          // overflowY: scroll ? 'scroll' : 'hidden',
+          overflowY: scroll ? 'scroll' : 'hidden',
         },
         x !== 'center' && {
           position: 'absolute',
@@ -219,12 +209,12 @@ const ControlsListContainer = styled.ul`
   line-height: 1.8;
   max-height: ${({ infoStatus, windowHeight }) =>
     infoStatus === 'expanded' ? '50vh' : windowHeight < 920 ? '34vh' : '40vh'};
-  overflow-y: ${({ scroll }) => (scroll ? 'scroll' : 'hidden')};
 
   & > li {
     border-bottom: ${({ theme }) => theme.border};
   }
 `;
+// overflow-y: ${({ scroll }) => (scroll ? 'scroll' : 'hidden')};
 
 const ControlsList = () => (
   <>
