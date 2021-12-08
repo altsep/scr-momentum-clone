@@ -5,20 +5,18 @@ import { useLoaderText } from '../Hooks/useLoaderText';
 
 function Background() {
   const [url, setUrl] = useState();
-  const { unsplash: state, handleUnsplashBool: handleBool } =
-    useContext(Context);
+  const { state, handleBool } = useContext(Context);
 
   // Urls object keys:
   // raw, full, regular, small, thumb
   useEffect(() => {
-    state.data && setUrl(state.data.urls.regular);
-  }, [state.data]);
+    state.data && setUrl(state.data.urls.full);
+  }, [state]);
 
   // Provide initial loader
-  const [awkwardLoading, setAwkwardLoading] =
-    useContext(Context).awkwardLoading;
+  const { awkwardLoading, setAwkwardLoading } = useContext(Context);
 
-  const [pseudoLoadingTimeout] = useContext(Context).pseudoLoadingTimeout;
+  const { pseudoLoadingTimeout } = useContext(Context);
   const [loadingTimeout, setLoadingTimeout] = useState(false);
 
   // Determite initial loader's fate
@@ -138,6 +136,9 @@ function Background() {
           style={{
             zIndex: '0',
             position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
@@ -145,8 +146,6 @@ function Background() {
             textShadow: 'none',
             fontSize: '5rem',
             objectFit: 'cover',
-            width: '100%',
-            height: '100%',
             userSelect: 'none',
           }}
         >

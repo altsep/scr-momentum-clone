@@ -27,7 +27,7 @@ export const useFetch = (url) => {
       loadingImage: true,
       error: false,
     }));
-    fetch(url, {})
+    fetch(url, { headers: { mode: 'no-cors' } })
       .then((x) => {
         // console.log(x);
         if (x.ok) {

@@ -28,7 +28,7 @@ export const useErrorMessage = (state) => {
         setErrorText(details + ' Please enter new request');
         setTimeout(() => {
           setErrorDisplay(false);
-        }, 1500);
+        }, 2000);
         break;
       default:
         setErrorText(details);
@@ -64,7 +64,7 @@ export const useErrorMessage = (state) => {
         style={Object.assign(
           {
             fontStyle: 'italic',
-            fontSize: props.size || '0.5em',
+            fontSize: props.size || '0.7rem',
             color: props.theme.color + 'e0' || '',
           },
           props.style

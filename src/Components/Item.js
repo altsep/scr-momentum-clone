@@ -7,7 +7,8 @@ const ItemTypes = {
 };
 
 function Item(props) {
-  const { x, y, id, i, el, infoExpanded } = props;
+  const { x, y, id, i, el, infoExpanded, windowDimensions, responsiveIndex } =
+    props;
 
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.item,
@@ -53,12 +54,13 @@ function Item(props) {
 
   //----
   const {
-    windowDimensions: { width, height },
-    awkwardLoading: [awkwardLoading],
+    awkwardLoading,
     theme,
   } = useContext(Context);
 
-  const [itemsHidden, setItemsHidden] = React.useState(false);
+  const [itemsHidden, setItemsHidden] = useState(false);
+
+  const { width, height } = windowDimensions;
 
   const [windowSmall, setWindowSmall] = useState(false);
   useEffect(
@@ -72,7 +74,10 @@ function Item(props) {
   const itemStyle = Object.assign(
     {
       zIndex: '1',
-      opacity: (isDragging || isOver) && 0.5,
+      opacity:
+        itemsHidden || (id !== 'info' && infoExpanded && !(isOver || canDrop))
+          ? 0
+          : (isDragging || isOver) && 0.5,
       border: isDragging
         ? 'none'
         : canDrop && theme.name === 'awkward'
@@ -80,7 +85,7 @@ function Item(props) {
         : canDrop && '2px dashed #eaeaea',
       justifySelf: x === 'left' ? 'start' : 'end',
       alignSelf: y === 'top' ? 'start' : 'end',
-      display: itemsHidden ? 'none' : 'grid',
+      display: 'grid',
       maxWidth: window.innerWidth / 2 - 20,
       maxHeight: '95%',
       gridRow: y === 'bottom' && '3 / 4',
@@ -97,7 +102,10 @@ function Item(props) {
 
   const itemStyleCenter = Object.assign(
     {
-      opacity: (isDragging || isOver) && 0.5,
+      opacity:
+        itemsHidden || (id !== 'info' && infoExpanded && !(isOver || canDrop))
+          ? 0
+          : (isDragging || isOver) && 0.5,
       border: isDragging
         ? 'none'
         : canDrop && theme.name === 'awkward'
@@ -107,7 +115,7 @@ function Item(props) {
       gridRow: '2 / 3',
       placeSelf: 'center',
       zIndex: '1',
-      display: awkwardLoading || itemsHidden ? 'none' : 'grid',
+      display: 'grid',
       maxWidth: window.innerWidth - 24,
       maxHeight: '95%',
       borderRadius: 20,
@@ -168,17 +176,21 @@ function Item(props) {
       ? {
           width: width / 3,
           height: '100%',
-          borderLeftWidth: i === 1 || i === 2 ? '1px' : '0',
+          borderLeftWidth:
+            responsiveIndex === 1 || responsiveIndex === 2 ? '1px' : '0',
           borderLeftStyle: canDrop ? 'dashed' : 'solid',
-          borderRightWidth: i === 0 || i === 1 ? '1px' : '0',
+          borderRightWidth:
+            responsiveIndex === 0 || responsiveIndex === 1 ? '1px' : '0',
           borderRightStyle: canDrop ? 'dashed' : 'solid',
         }
       : width < 700 && {
           width: '100%',
           height: height / 3,
-          borderTopWidth: i === 1 || i === 2 ? '1px' : '0',
+          borderTopWidth:
+            responsiveIndex === 1 || responsiveIndex === 2 ? '1px' : '0',
           borderTopStyle: canDrop ? 'dashed' : 'solid',
-          borderBottomWidth: i === 0 || i === 1 ? '1px' : '0',
+          borderBottomWidth:
+            responsiveIndex === 0 || responsiveIndex === 1 ? '1px' : '0',
           borderBottomStyle: canDrop ? 'dashed' : 'solid',
         }
   );
@@ -207,6 +219,7 @@ function Item(props) {
         flexStyleX: windowSmall ? 'center' : flexStyleX,
         flexStyleY: windowSmall ? 'center' : flexStyleY,
         windowSmall,
+        windowDimensions: props.windowDimensions,
       }}
     >
       <div
@@ -219,9 +232,8 @@ function Item(props) {
             ? itemStyleCenter
             : itemStyle
         }
-        hidden={awkwardLoading}
       >
-        {infoExpanded && id !== 'info' ? <></> : el}
+        {el}
         {canDrop && (
           <div
             style={{

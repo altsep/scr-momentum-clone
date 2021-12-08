@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useFetch } from '../Hooks/useFetch';
 
 const Provider = (props) => {
-  // fetch image
-  const unsplashName = useState('');
+  // fetch unsplash
+  const [unsplashName, setUnsplashName] = useState('');
   const [unsplashUrl, setUnsplashUrl] = useState('');
 
-  const { state: unsplash, handleBool: handleUnsplashBool } =
-    useFetch(unsplashUrl);
+  const { state, setState, handleBool } = useFetch(unsplashUrl);
 
   const unsplashUrlTemp =
     'https://apis.scrimba.com/unsplash/photos/random?orientation=landscape';
@@ -19,69 +18,27 @@ const Provider = (props) => {
   }, []);
 
   useEffect(() => {
-    if (unsplashName[0]) {
-      setUnsplashUrl(unsplashUrlTemp + `&query=${unsplashName[0]}`);
-      fetch(unsplashUrlTemp)
-        .then((a) => {
-          a.ok && localStorage.setItem('imageThemeName', unsplashName[0]);
+    if (unsplashName) {
+      fetch(unsplashUrlTemp + `&query=${unsplashName}`)
+        .then((a) => a.json())
+        .then((b) => {
+          if (b.errors) throw Error(b.errors);
+          else {
+            setUnsplashUrl(unsplashUrlTemp + `&query=${unsplashName}`);
+            localStorage.setItem('imageThemeName', unsplashName);
+          }
         })
-        .catch((err) => console.log('Failed to fetch unsplash.'));
+        .catch((err) =>
+          setState((s) => ({ ...s, error: true, errorDetails: err.message }))
+        );
     }
-  }, [unsplashName]);
-
-  // fetch crypto
-  const cryptoName = useState('');
-  const cryptoUrl = `https://api.coingecko.com/api/v3/coins/${cryptoName[0]}?localization=false&market_data=true`;
-  const [cryptoFetchUrl, setCryptoFetchUrl] = useState('');
-  const { state: cryptoState, handleBool: handleCryptoBool } =
-    useFetch(cryptoFetchUrl);
-
-  useEffect(() => {
-    const item = localStorage.getItem('cryptoCurrencyName');
-    cryptoName[1](item ? item : 'bitcoin');
-  }, []);
-
-  useEffect(() => {
-    const item = localStorage.getItem('cryptoCurrencyName');
-    fetch(cryptoUrl)
-      .then((a) => {
-        if (a.ok && cryptoName[0]) {
-          localStorage.setItem('cryptoCurrencyName', cryptoName[0]);
-          setCryptoFetchUrl(cryptoUrl);
-        } else if (item) cryptoName[1](item);
-      })
-      .catch((err) => console.log('Failed to fetch crypto.'));
-  }, [cryptoName, cryptoUrl]);
-
-  // fetch weather
-  const cityName = useState('');
-  const [weatherUrl, setWeatherUrl] = useState('');
-  const { state: weatherState, handleBool: handleWeatherBool } =
-    useFetch(weatherUrl);
-
-  useEffect(() => {
-    const item = localStorage.getItem('weatherLocationName');
-    item && cityName[1](item);
-  }, []);
-
-  useEffect(() => {
-    fetch(
-      `https://apis.scrimba.com/openweathermap/data/2.5/weather?q=${cityName}`
-    )
-      .then((a) => a.ok && a.json())
-      .then(
-        (a) =>
-          a.cod !== '404' &&
-          localStorage.setItem('weatherLocationName', cityName[0])
-      )
-      .catch((err) => console.log('Failed to fetch weather.'));
-  }, [cityName]);
+  }, [setState, unsplashName]);
 
   // Handling initial loader to display elements after timeout in error scenario and to display the loader just once
-  const awkwardLoading = useState(true);
-  const pseudoLoadingTimeout = useState(true);
+  const [awkwardLoading, setAwkwardLoading] = useState(true);
+  const [pseudoLoadingTimeout, setPseudoLoadingTimeout] = useState(true);
   useEffect(() => {
-    const timeoutId = setTimeout(() => pseudoLoadingTimeout[1](false), 1000);
+    const timeoutId = setTimeout(() => setPseudoLoadingTimeout(false), 5000);
     // Use clean-up function to make the process repeatable
     return () => clearTimeout(timeoutId);
   }, [pseudoLoadingTimeout]);
@@ -89,7 +46,6 @@ const Provider = (props) => {
   // Theming to accomodate initial loader and possible failure to either fetch location or load image. Used instead of a backup image
   const [theme, setTheme] = useState({});
 
-  const state = unsplash;
   const error = state.error;
   const url = state.data && state.data.urls.regular;
   const themes = {
@@ -106,55 +62,30 @@ const Provider = (props) => {
       border: 'solid 2px #2b2b2b4d',
     },
   };
+
   useEffect(() => {
-    awkwardLoading[0] && (state.loadingImage || error)
+    awkwardLoading && (state.loadingImage || error)
       ? setTheme(themes.awkward)
       : !error && url && setTheme(themes.normal);
-  }, [awkwardLoading[0], state.loadingImage, state.data, error]);
+  }, [awkwardLoading, state.loadingImage, state.data, error]);
 
   // State for info element that is used in main component
   const [infoStatus, setInfoStatus] = useState('initial');
 
-  // Get window dimensions on resize
-  const [windowDimensions, setWindowDimensions] = useState({
-    width: 0,
-    height: 0,
-  });
-
-  useEffect(() => {
-    setDimensions();
-    window.addEventListener('resize', () => setDimensions());
-    return () => window.removeEventListener('resize', () => setDimensions());
-  }, []);
-
-  useEffect(() => setDimensions(), [infoStatus]);
-
-  const setDimensions = () =>
-    setWindowDimensions({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-
   return (
     <Context.Provider
       value={{
-        unsplash,
-        handleUnsplashBool,
-        cryptoState,
-        handleCryptoBool,
-        setWeatherUrl,
-        weatherState,
-        handleWeatherBool,
+        state,
+        handleBool,
+        setUnsplashName,
         awkwardLoading,
+        setAwkwardLoading,
         pseudoLoadingTimeout,
+        setPseudoLoadingTimeout,
         theme,
         themes,
-        cryptoName,
         infoStatus,
         setInfoStatus,
-        unsplashName,
-        cityName,
-        windowDimensions,
       }}
     >
       {props.children}

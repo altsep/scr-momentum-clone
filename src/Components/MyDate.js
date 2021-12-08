@@ -27,8 +27,7 @@ function MyDate() {
     }
   }, [data]);
 
-  const { windowDimensions } = useContext(Context);
-  const { id, x, y, flexStyleX, isDragging, canDrop, windowSmall } =
+  const { id, x, y, flexStyleX, isDragging, canDrop, windowSmall, windowDimensions } =
     useContext(ItemContext);
 
   // Handle controls

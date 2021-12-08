@@ -9,11 +9,11 @@ import { Provider } from './Components/Context';
 
 ReactDOM.render(
   <React.StrictMode>
-      <DndProvider backend={HTML5Backend}>
-        <Provider>
-          <App />
-        </Provider>
-      </DndProvider>
+    <DndProvider backend={HTML5Backend}>
+      <Provider>
+        <App />
+      </Provider>
+    </DndProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -1,6 +1,8 @@
 const Switch = (props) => (
   <svg
-    height='1.5rem'
+    style={{
+      height: '1.5rem',
+    }}
     xmlns='http://www.w3.org/2000/svg'
     className={props.active ? 'icon-switch' : undefined}
     fill='none'
@@ -58,9 +60,50 @@ const Reddit = (props) => (
   </svg>
 );
 
+const Weather = ({ x, state, handleBool, dataAvailable }) => {
+  return (
+    <>
+      {dataAvailable && (
+        <div
+          hidden={state.loadingImage}
+          style={{
+            order: x === 'right' ? -1 : 1 || '',
+          }}
+        >
+          <img
+            style={{
+              display: 'flex',
+              margin: x !== 'center' && '0 1em',
+              // pointerEvents: 'none',
+            }}
+            src={
+              state.data
+                ? `https://openweathermap.org/img/w/${state.data.weather[0].icon}.png`
+                : undefined
+            }
+            alt={state.data.weather[0].description}
+            title={
+              state.data.weather[0].description
+                .split(' ')
+                .map((a) => a[0].toUpperCase() + a.slice(1))
+                .join(' ') || undefined
+            }
+            onLoad={() => handleBool('loadingImage', false)}
+            onError={() => {
+              handleBool('loadingImage', false);
+              console.log("Weather icon couldn't load");
+            }}
+          />
+        </div>
+      )}
+    </>
+  );
+};
+
 export {
   Switch as IconSwitch,
   Refresh as IconRefresh,
   Twitter as IconTwitter,
   Reddit as IconReddit,
+  Weather as IconWeather,
 };

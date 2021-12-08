@@ -5,22 +5,41 @@ import { ItemContext } from './Item';
 import { useErrorMessage } from '../Hooks/useErrorMessage';
 import ControlsSwitch from '../Misc/ControlsSwitch';
 import { IconSwitch } from '../Misc/Icons';
-import NamePlusInput from './NamePlusInput';
+import { WeatherFull } from './WeatherFull';
+import { WeatherSmall } from './WeatherSmall';
+import { IconWeather as Icon } from '../Misc/Icons';
+import { useFetch } from '../Hooks/useFetch';
 
 function Weather() {
   const [coords, setCoords] = useState();
   const {
-    setWeatherUrl: setUrl,
-    cityName: cityNameState,
-    weatherState: state,
-    handleWeatherBool: handleBool,
     theme,
   } = useContext(Context);
 
-  const [cityName, setCityName] = cityNameState;
-
   const { id, x, y, isDragging, canDrop, flexStyleX, flexStyleY, windowSmall } =
     useContext(ItemContext);
+
+  const [cityName, setCityName] = useState('');
+  const [url, setUrl] = useState('');
+  const { state, handleBool } = useFetch(url);
+
+  useEffect(() => {
+    const item = localStorage.getItem('weatherLocationName');
+    item && setCityName(item);
+  }, []);
+
+  useEffect(() => {
+    cityName && fetch(
+      `https://apis.scrimba.com/openweathermap/data/2.5/weather?q=${cityName}`
+    )
+      .then((a) => a.ok && a.json())
+      .then(
+        (a) =>
+          a.cod !== '404' &&
+          localStorage.setItem('weatherLocationName', cityName)
+      )
+      .catch(() => console.log('Failed to fetch weather.'));
+  }, [cityName]);
 
   const { ErrorMessage, setErrorText, errorDisplay } = useErrorMessage(state);
 
@@ -81,8 +100,6 @@ function Weather() {
         );
   }, [coords, units, cityName]);
 
-  const iconWithProps = <Icon state={state} handleBool={handleBool} x={x} />;
-
   const loaderText = useLoaderText(state.loading, x === 'center' && '1.4em');
   const [active, setActive] = useState(false);
   const [hover, setHover] = useState(false);
@@ -119,6 +136,22 @@ function Weather() {
         wind: state.data.wind.speed.toFixed() + windText,
       });
   }, [state, units]);
+  
+  const [dataAvailable, setDataAvailable] = useState(false);
+  useEffect(
+    () =>
+      state && state.data ? setDataAvailable(true) : setDataAvailable(false),
+    [setErrorText, state, state.data]
+  );
+
+  const iconWithProps = (
+    <Icon
+      state={state}
+      handleBool={handleBool}
+      x={x}
+      dataAvailable={dataAvailable}
+    />
+  );
 
   const propsMain = {
     id,
@@ -165,16 +198,13 @@ function Weather() {
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
-        {state.loading
-          ? loaderText
-          : state &&
-            state.data &&
-            state.data.main &&
-            (x === 'center' ? (
-              <WeatherFull props={propsMain} />
-            ) : (
-              <WeatherSmall props={propsMain} />
-            ))}
+        {state.loading ? (
+          loaderText
+        ) : x === 'center' ? (
+          <WeatherFull props={propsMain} />
+        ) : (
+          <WeatherSmall props={propsMain} />
+        )}
         {!isDragging && !canDrop && !windowSmall && state.data && (
           <ControlsSwitch
             props={{
@@ -192,13 +222,13 @@ function Weather() {
           />
         )}
       </div>
-      {state.error && errorDisplay && (
+      {((state.error && errorDisplay) || !dataAvailable) && (
         <ErrorMessage
           x={x}
           theme={theme}
           style={{
             display: 'border-box',
-            marginTop: state.data ? 10 : '',
+            marginTop: !state.data || errorDisplay ? 10 : '',
             justifySelf: flexStyleX,
           }}
         />
@@ -206,231 +236,5 @@ function Weather() {
     </div>
   );
 }
-
-const WeatherFull = ({ props }) => {
-  const {
-    state,
-    temp,
-    feels,
-    wind,
-    x,
-    flexStyleX,
-    flexStyleY,
-    iconWithProps,
-    id,
-    setQuery,
-    theme,
-    char,
-    handleClick,
-  } = props;
-  return (
-    <div
-      className='weather'
-      style={{
-        width: '19em',
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: flexStyleX,
-        alignItems: flexStyleY,
-        textAlign: flexStyleX,
-        padding: 0,
-      }}
-    >
-      <div
-        style={{
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          alignItems: flexStyleX,
-        }}
-      >
-        <p
-          style={{
-            fontSize: '3em',
-            fontWeight: '700',
-          }}
-          onClick={handleClick}
-        >
-          {temp}
-        </p>
-        <div
-          className='weather details'
-          style={{
-            marginTop: 10,
-            fontSize: '0.7em',
-            fontWeight: '100',
-            display: 'flex',
-          }}
-          onClick={handleClick}
-        >
-          Feels like&nbsp;
-          {feels}
-        </div>
-        <div
-          className='weather border-line'
-          style={{
-            marginTop: 30,
-            paddingTop: 10,
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-around',
-            alignItems: 'center',
-            borderTop: theme.border,
-          }}
-        >
-          <div className='title'>
-            <NamePlusInput
-              id={id}
-              x={x}
-              state={state}
-              setQuery={setQuery}
-              titleText={state.data.name}
-              theme={theme}
-              char={char}
-            />
-          </div>
-          {iconWithProps}
-        </div>
-      </div>
-      <div
-        className='weather details border-line'
-        style={{
-          marginLeft: 30,
-          paddingLeft: 30,
-          fontSize: '1em',
-          fontWeight: '100',
-          lineHeight: 2,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: flexStyleY,
-          borderLeft: theme.border,
-          width: '50%',
-          textAlign: 'start',
-        }}
-        onClick={handleClick}
-      >
-        <p
-          style={{
-            textTransform: 'capitalize',
-          }}
-        >
-          {state.data.weather[0].description}
-        </p>
-        <p>{wind}</p>
-        <p>{state.data.main.humidity}%</p>
-        <p>{state.data.main.pressure}hPa</p>
-      </div>
-    </div>
-  );
-};
-
-const WeatherSmall = ({ props }) => {
-  const {
-    state,
-    temp,
-    wind,
-    x,
-    flexStyleX,
-    flexStyleY,
-    iconWithProps,
-    id,
-    setQuery,
-    theme,
-    char,
-    handleClick,
-    windowSmall,
-  } = props;
-  return (
-    <div
-      className='weather'
-      style={{
-        width: windowSmall ? '100%' : '7em',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: flexStyleY,
-        alignItems: flexStyleX,
-        textAlign: flexStyleX,
-        padding: 0,
-      }}
-    >
-      <div className='weather title'>
-        <NamePlusInput
-          id={id}
-          x={x}
-          state={state}
-          setQuery={setQuery}
-          titleText={state.data.name}
-          theme={theme}
-          char={char}
-        />
-      </div>
-      <div
-        style={{
-          lineHeight: 1.5,
-          display: 'flex',
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          justifyContent: flexStyleX,
-          alignItems: 'center',
-        }}
-        onClick={handleClick}
-      >
-        {iconWithProps}
-        <div
-          className='weather details'
-          style={{
-            marginTop: 10,
-            fontWeight: '100',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: flexStyleY,
-            alignItems: windowSmall ? 'flex-start' : flexStyleX,
-          }}
-        >
-          <p>{temp}</p>
-          <p>{state.data.weather[0].main}</p>
-          <p>{wind}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const Icon = (props) => {
-  return (
-    <div
-      hidden={props.state.loadingImage}
-      style={{
-        order: props.x === 'right' ? -1 : 1 || '',
-      }}
-    >
-      <img
-        style={{
-          display: 'flex',
-          margin: props.x !== 'center' && '0 1em',
-          // pointerEvents: 'none',
-        }}
-        src={
-          props.state.data
-            ? `https://openweathermap.org/img/w/${props.state.data.weather[0].icon}.png`
-            : undefined
-        }
-        alt={props.state.data.weather[0].description}
-        title={
-          props.state.data.weather[0].description
-            .split(' ')
-            .map((a) => a[0].toUpperCase() + a.slice(1))
-            .join(' ') || undefined
-        }
-        onLoad={() => props.handleBool('loadingImage', false)}
-        onError={() => {
-          props.handleBool('loadingImage', false);
-          console.log("Weather icon couldn't load");
-        }}
-      />
-    </div>
-  );
-};
 
 export default Weather;

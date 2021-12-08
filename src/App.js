@@ -2,11 +2,12 @@ import React, { useState, useEffect, useContext } from 'react';
 import Item from './Components/Item';
 import Crypto from './Components/Crypto';
 import Weather from './Components/Weather';
-import Location from './Components/Location';
+import Location from './Components/Unsplash';
 import CurrentDate from './Components/MyDate';
 import Info from './Components/Info';
-import Background from './Components/BackgroundImage';
+import Background from './Components/UnsplashBackground';
 import { Context } from './Components/Context';
+import { useWindowDimensions } from './Hooks/useWindowDimensions';
 
 function App() {
   const [itemList, setItemList] = useState([
@@ -17,8 +18,9 @@ function App() {
     { id: 'info', el: <Info /> },
   ]);
 
-  const { theme, awkwardLoading, unsplash, infoStatus, windowDimensions } =
-    useContext(Context);
+  const { state: unsplash, theme, awkwardLoading, infoStatus } = useContext(Context);
+
+  const windowDimensions = useWindowDimensions();
 
   useEffect(() => {
     const items = JSON.parse(localStorage.getItem('items'));
@@ -42,12 +44,17 @@ function App() {
           <Item
             el={el.el}
             id={el.id}
-            i={i}
-            setList={setItemList}
             key={el.id}
+            i={i}
+            responsiveIndex={itemList
+              .filter((a) => a.id !== 'location' && a.id !== 'info' && a.id)
+              .map((a) => a.id)
+              .findIndex((a) => a === el.id)}
+            setList={setItemList}
             x={pos.x}
             y={pos.y}
             infoExpanded={infoStatus === 'expanded'}
+            windowDimensions={windowDimensions}
           />
         );
       })}
@@ -59,7 +66,7 @@ function App() {
 const mainStyle = (theme, awkwardLoading, unsplash, window) =>
   Object.assign(
     {
-      background: awkwardLoading[0] ? '#fff' : unsplash.error && '#fafafa',
+      background: awkwardLoading ? '#fff' : unsplash.error && '#fafafa',
       color: theme.color,
       textShadow: theme.textShadow,
       height: '100vh',

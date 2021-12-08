@@ -1,74 +1,6 @@
-import React, { useContext } from 'react';
-import { useLoaderText } from '../Hooks/useLoaderText';
-import { Context } from './Context';
-import { ItemContext } from './Item';
-import { useErrorMessage } from '../Hooks/useErrorMessage';
 import NamePlusInput from './NamePlusInput';
 
-function Location() {
-  const {
-    unsplash: state,
-    unsplashName: [unsplashName, setUnsplashName],
-  } = useContext(Context);
-  const { id, x, canDrop, flexStyleX } = useContext(ItemContext);
-  const loaderText = useLoaderText(state.loadingImage, x === 'center' && '1em');
-  const { theme } = useContext(Context);
-  const { ErrorMessage, errorDisplay } = useErrorMessage(state);
-
-  return (
-    <div
-      id='location'
-      className='details'
-      style={Object.assign(
-        {
-          placeSelf: (canDrop || x === 'center') && 'center',
-          width:
-            state.loadingImage || canDrop ? '6em' : x === 'center' && '12em',
-          textAlign: flexStyleX,
-          fontSize: '1em',
-          display: 'grid',
-        },
-        x === 'center' && {
-          fontSize: '1.4em',
-          display: 'grid',
-          height: '100%',
-        }
-      )}
-    >
-      {state.loading || (state.data !== null && state.loadingImage)
-        ? loaderText
-        : state.data !== null &&
-          !state.loadingImage &&
-          (x === 'center' ? (
-            <LocationFull
-              id={id}
-              x={x}
-              state={state}
-              setQuery={setUnsplashName}
-              theme={theme}
-              char='l'
-            />
-          ) : (
-            <LocationSmall
-              id={id}
-              x={x}
-              state={state}
-              setQuery={setUnsplashName}
-              theme={theme}
-              char='l'
-              flexStyleX={flexStyleX}
-            />
-          ))}
-      {state.error && !state.data && errorDisplay ? (
-        <ErrorMessage text="Couldn't load image data" theme={theme} />
-      ) : (
-        state.error && errorDisplay && <ErrorMessage theme={theme} />
-      )}
-    </div>
-  );
-}
-
-const LocationFull = ({ id, x, state, setQuery, theme, char }) => (
+export const LocationFull = ({ id, x, state, setQuery, theme, char }) => (
   <div
     style={{
       placeSelf: 'center',
@@ -168,19 +100,3 @@ const LocationFull = ({ id, x, state, setQuery, theme, char }) => (
     </div>
   </div>
 );
-
-const LocationSmall = ({ id, x, state, theme, setQuery, char, flexStyleX }) => (
-  <div style={{ placeSelf: flexStyleX }}>
-    <NamePlusInput
-      id={id}
-      x={x}
-      state={state}
-      setQuery={setQuery}
-      titleText={state.data.location.title || '?'}
-      theme={theme}
-      char={char}
-    />
-  </div>
-);
-
-export default Location;

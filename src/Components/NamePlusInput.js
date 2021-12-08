@@ -1,13 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const NamePlusInput = ({ id, x, state, setQuery, titleText, theme, char }) => {
-  const [titleName, setTitleName] = useState(titleText);
+const NamePlusInput = ({ id, x, state, setQuery, theme, char }) => {
+  const [titleName, setTitleName] = useState('');
   const [titleValue, setTitleValue] = useState(titleName || '');
 
   useEffect(
     () =>
-      id === 'crypto' && setTitleName(state && state.data && state.data.name),
-    [state.data]
+      state &&
+      state.data &&
+      setTitleName(
+        state.data.name ||
+          state.data.location.title ||
+          (id === 'location' && !state.data.location.title && '?')
+      ),
+    [state, id]
   );
 
   const titleRef = useRef(null);
@@ -73,7 +79,8 @@ const NamePlusInput = ({ id, x, state, setQuery, titleText, theme, char }) => {
           justifyContent: 'center',
         },
         id === 'crypto' &&
-          x === 'center' && {
+          x === 'center' &&
+          state.data && {
             display: 'block',
             alignSelf: 'center',
             writingMode: 'vertical-rl',
@@ -84,10 +91,22 @@ const NamePlusInput = ({ id, x, state, setQuery, titleText, theme, char }) => {
       <p
         className='name'
         ref={titleRef}
-        style={{ display: titleDisplay }}
+        style={{
+          display: titleDisplay,
+          opacity: !state.data && 0.8,
+          fontStyle: !state.data && 'italic',
+          fontSize: !state.data && '80%',
+          textDecoration: !state.data && 'underline',
+        }}
         onClick={handleNameDisplay}
       >
-        {titleName}
+        {state.data
+          ? titleName
+          : id === 'weather'
+          ? 'Enter location'
+          : id === 'crypto'
+          ? 'Enter currency'
+          : id === 'location' && 'Enter keyword'}
       </p>
       <div
         style={Object.assign(

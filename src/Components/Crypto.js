@@ -1,20 +1,46 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useLoaderText } from '../Hooks/useLoaderText';
 import { Context } from './Context';
-import { ItemContext } from './Item';
 import { useErrorMessage } from '../Hooks/useErrorMessage';
-import NamePlusInput from './NamePlusInput';
-import { IconReddit, IconTwitter } from '../Misc/Icons';
+import { ItemContext } from './Item';
+import { CryptoFull } from './CryptoFull';
+import { CryptoSmall } from './CryptoSmall';
+import { useFetch } from '../Hooks/useFetch';
 
 function Crypto() {
-  const {
-    cryptoState: state,
-    handleCryptoBool: handleBool,
-    theme,
-    cryptoName: [cryptoName, setCryptoName],
-  } = useContext(Context);
+  const { theme } = useContext(Context);
 
-  const { id, x, canDrop, flexStyleX, flexStyleY, windowSmall } = useContext(ItemContext);
+  const { id, x, canDrop, flexStyleX, flexStyleY, windowSmall } =
+    useContext(ItemContext);
+
+  const [cryptoName, setCryptoName] = useState('');
+  const cryptoUrl = `https://api.coingecko.com/api/v3/coins/${cryptoName}?localization=false&market_data=true`;
+  const [cryptoFetchUrl, setCryptoFetchUrl] = useState('');
+  const { state, setState, handleBool } = useFetch(cryptoFetchUrl);
+
+  useEffect(() => {
+    const item = localStorage.getItem('cryptoCurrencyName');
+    setCryptoName(item ? item : 'bitcoin');
+  }, []);
+
+  useEffect(() => {
+    const item = localStorage.getItem('cryptoCurrencyName');
+    if (cryptoName) {
+      fetch(cryptoUrl)
+        .then((a) => {
+          if (a.ok) {
+            localStorage.setItem('cryptoCurrencyName', cryptoName);
+            setCryptoFetchUrl(cryptoUrl);
+          } else if (item && cryptoName !== item) {
+            setCryptoName(item);
+            throw Error(a.status);
+          }
+        })
+        .catch((err) => {
+          setState((s) => ({ ...s, error: true, errorDetails: err.message }));
+        });
+    }
+  }, [cryptoName, cryptoUrl, setState]);
 
   const loaderText = useLoaderText(state.loading, x === 'center' && '1.4em');
 
@@ -36,207 +62,42 @@ function Crypto() {
   const { ErrorMessage, errorDisplay } = useErrorMessage(state);
 
   return (
-    <>
-      {state.loading
-        ? loaderText
-        : state.data &&
-          !state.loading &&
-          (x === 'center' ? (
-            <div
-              className='crypto-center'
-              style={{
-                placeSelf: (canDrop || x === 'center') && 'center',
-                display: 'grid',
-                gridTemplateColumns: '1fr 50px',
-                gridTemplateRows: '2fr 1fr',
-                width: '450px',
-                gap: 30,
-              }}
-            >
-              <div
-                className='title'
-                style={{
-                  gridColumn: '2 / 3',
-                  gridRow: '1 / 2',
-                  display: 'grid',
-                  placeItems: 'center',
-                  fontSize: '1.2em',
-                }}
-              >
-                <a
-                  style={{
-                    alignSelf: 'start',
-                  }}
-                  href={state.data.links && state.data.links.homepage[0]}
-                  target='_blank'
-                  rel='noreferrer'
-                  onMouseEnter={() => handleHovered('logo', true)}
-                  onMouseLeave={() => handleHovered('logo', false)}
-                >
-                  <Logo
-                    state={state}
-                    handleBool={handleBool}
-                    hovered={hovered}
-                    x={x}
-                    size='small'
-                  />
-                </a>
-                <NamePlusInput
-                  id={id}
-                  x={x}
-                  state={state}
-                  setQuery={setCryptoName}
-                  titleText={state.data.name}
-                  theme={theme}
-                  char='c'
-                />
-              </div>
-              <div
-                style={{
-                  alignSelf: 'start',
-                  gridColumn: '2 / 3',
-                  gridRow: '2 / 3',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                }}
-              >
-                <a
-                  className='crypto-icon-link'
-                  href={`https://twitter.com/${state.data.links.twitter_screen_name}`}
-                  target='_blank'
-                  rel='noreferrer'
-                  style={iconStyle(hovered.twitter, theme)}
-                  onMouseEnter={() => handleHovered('twitter', true)}
-                  onMouseLeave={() => handleHovered('twitter', false)}
-                >
-                  <IconTwitter hovered={hovered.twitter} theme={theme} />
-                </a>
-                <a
-                  className='crypto-icon-link'
-                  href={state.data.links.subreddit_url}
-                  target='_blank'
-                  rel='noreferrer'
-                  style={iconStyle(hovered.reddit, theme)}
-                  onMouseEnter={() => handleHovered('reddit', true)}
-                  onMouseLeave={() => handleHovered('reddit', false)}
-                >
-                  <IconReddit hovered={hovered.reddit} theme={theme} />
-                </a>
-              </div>
-              <div
-                className='crypto center details'
-                style={{
-                  placeSelf: 'start',
-                  gridColumn: '1 / 2',
-                  gridRow: '1 / 2',
-                  width: '250px',
-                  fontSize: '2em',
-                }}
-              >
-                <Details
-                  state={state}
-                  handleHovered={handleHovered}
-                  hovered={hovered}
-                  x={x}
-                  currencyName={state.data.id}
-                />
-              </div>
-              <div
-                className='crypto-description'
-                style={{
-                  placeSelf: 'start',
-                  fontSize: '0.6em',
-                  gridColumn: '1 / 2',
-                  gridRow: '2 / 3',
-                }}
-              >
-                {state.data.public_notice !== null ? (
-                  <div>
-                    <h4>Public notice:</h4>
-                    <p style={{ marginTop: 5 }}>{state.data.public_notice}</p>
-                  </div>
-                ) : (
-                  state.data.description.en !== null && (
-                    <div>
-                      <h4>Description:</h4>
-                      <p style={{ marginTop: 5 }}>
-                        {state.data.description.en.match(/[\w\s;-]*\./)[0]}
-                      </p>
-                    </div>
-                  )
-                )}
-              </div>
-            </div>
-          ) : (
-            <div
-              className='crypto-normal'
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: flexStyleX,
-                justifyContent: flexStyleY,
-                transform: windowSmall && 'scale(1.4)',
-              }}
-            >
-              <div
-                className='title'
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: flexStyleY,
-                  alignItems: 'center',
-                }}
-                onMouseEnter={() => handleHovered('logo', true)}
-                onMouseLeave={() => handleHovered('logo', false)}
-              >
-                <a
-                  className='crypto-homepage'
-                  href={state.data.links.homepage[0]}
-                  target='_blank'
-                  rel='noreferrer'
-                  style={{
-                    color: theme.color,
-                    display: 'grid',
-                  }}
-                >
-                  <Logo
-                    state={state}
-                    handleBool={handleBool}
-                    hovered={hovered}
-                    x={x}
-                    size='thumb'
-                  />
-                </a>
-                &nbsp;
-                <NamePlusInput
-                  id={id}
-                  x={x}
-                  state={state}
-                  setQuery={setCryptoName}
-                  titleText={state.data.name}
-                  theme={theme}
-                  char='c'
-                />
-              </div>
-              <div
-                className='crypto-details-container'
-                style={{
-                  marginTop: 10,
-                  lineHeight: 1.5,
-                }}
-              >
-                <Details
-                  state={state}
-                  handleHovered={handleHovered}
-                  hovered={hovered}
-                  x={x}
-                  currencyName={state.data.id}
-                  windowSmall={windowSmall}
-                />
-              </div>
-            </div>
-          ))}
+    <div
+      style={{
+        transform: windowSmall && 'scale(1.4)',
+        display: 'grid',
+        justifyContent: flexStyleX,
+      }}
+    >
+      {state.loading ? (
+        loaderText
+      ) : x === 'center' ? (
+        <CryptoFull
+          id={id}
+          x={x}
+          canDrop={canDrop}
+          state={state}
+          theme={theme}
+          handleBool={handleBool}
+          handleHovered={handleHovered}
+          hovered={hovered}
+          setCryptoName={setCryptoName}
+        />
+      ) : (
+        <CryptoSmall
+          id={id}
+          x={x}
+          flexStyleX={flexStyleX}
+          flexStyleY={flexStyleY}
+          windowSmall={windowSmall}
+          state={state}
+          theme={theme}
+          handleBool={handleBool}
+          handleHovered={handleHovered}
+          hovered={hovered}
+          setCryptoName={setCryptoName}
+        />
+      )}
       {state.error && errorDisplay && (
         <ErrorMessage
           x={x}
@@ -244,106 +105,8 @@ function Crypto() {
           style={{ marginTop: state.data ? 10 : '', justifySelf: flexStyleX }}
         />
       )}
-    </>
-  );
-}
-
-const Logo = ({ state, handleBool, hovered, size, x }) => (
-  <img
-    src={state.data.image[size]}
-    alt=''
-    onLoad={() => handleBool('loadingImage', false)}
-    onError={() => handleBool('loadingImage', false)}
-    style={Object.assign(
-      {
-        transform: hovered.logo && 'rotate(-30deg)',
-        pointerEvents: 'none',
-      },
-      x === 'center' && {
-        width: 40,
-        height: 40,
-      }
-    )}
-  />
-);
-
-const Details = ({ state, handleHovered, hovered, x, currencyName, windowSmall }) => {
-  return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gridTemplateRows: '1fr',
-        gap: 20,
-      }}
-      onMouseEnter={() => handleHovered('details', true)}
-      onMouseLeave={() => handleHovered('details', false)}
-    >
-      <div
-        className={`crypto details ${x}`}
-        style={{
-          gridColumn: x === 'right' ? '2 / 3' : '1 / 2',
-          gridRow: '1 / 2',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <p>
-          {state.data.market_data.current_price.usd
-            ? state.data.market_data.current_price.usd.toLocaleString('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                maximumFractionDigits: currencyName === 'bitcoin' ? 0 : 8,
-              })
-            : ''}
-        </p>
-        <p>
-          {state.data.market_data.high_24h.usd
-            ? state.data.market_data.high_24h.usd.toLocaleString('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                maximumFractionDigits: currencyName === 'bitcoin' ? 0 : 8,
-              })
-            : ''}
-        </p>
-        <p>
-          {state.data.market_data.low_24h.usd
-            ? state.data.market_data.low_24h.usd.toLocaleString('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                maximumFractionDigits: currencyName === 'bitcoin' ? 0 : 8,
-              })
-            : ''}
-        </p>
-      </div>
-      <div
-        className={`crypto details ${x}`}
-        style={{
-          gridColumn: x === 'right' ? '1 / 2' : '2 / 3',
-          gridRow: '1 / 2',
-          isplay: 'flex',
-          flexDirection: 'column',
-          opacity: hovered.details || windowSmall ? 0.8 : 0,
-        }}
-      >
-        <p>Current</p>
-        <p>High</p>
-        <p>Low</p>
-      </div>
     </div>
   );
-};
-
-const iconStyle = (hovered, theme) =>
-  hovered
-    ? {
-        backgroundColor:
-          theme.name === 'normal'
-            ? 'rgba(43, 43, 43, 0.6)'
-            : 'rgba(237, 237, 237, 0.6)',
-        padding: 5,
-        borderRadius: '50%',
-      }
-    : { padding: 5 };
+}
 
 export default Crypto;
