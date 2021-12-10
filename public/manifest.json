@@ -1,7 +1,7 @@
 {
   "short_name": "Home Page",
   "name": "Personal Customizable Dashboard - based on Momentum extension",
-  "version": "0.2",
+  "version": "0.3",
   "icons": [
     {
       "src": "favicon.ico",

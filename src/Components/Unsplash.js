@@ -91,7 +91,7 @@ function Location() {
             style={{ marginLeft: 10 }}
             onClick={handleUnsplashRestore}
           >
-            {state.data !== unsplashItem && 'Restore'}
+            {unsplashItem && state.data.id !== unsplashItem.id && 'Restore'}
           </p>
         </div>
       )}

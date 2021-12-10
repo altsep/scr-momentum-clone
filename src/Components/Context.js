@@ -5,7 +5,7 @@ const Provider = (props) => {
   // fetch unsplash
   const [unsplashName, setUnsplashName] = useState('');
   const [unsplashUrl, setUnsplashUrl] = useState('');
-  const [unsplashItem, setUnsplashItem] = useState({});
+  const [unsplashItem, setUnsplashItem] = useState(null);
   const [savedText, setSavedText] = useState('Save');
 
   const { state, setState, handleBool } = useFetch(unsplashUrl);
@@ -18,12 +18,16 @@ const Provider = (props) => {
     if (saved) {
       setState((s) => ({ ...s, data: saved }));
       setSavedText('Saved!');
-      setUnsplashItem(saved);
     } else if (keyword) setUnsplashUrl(unsplashUrlTemp + `&query=${keyword}`);
     else {
       setUnsplashUrl(unsplashUrlTemp);
     }
   }, []);
+
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem('imageSaved'));
+    setUnsplashItem(saved);
+  }, [savedText]);
 
   const handleUnsplashSaved = () => {
     const item = JSON.parse(localStorage.getItem('imageSaved'));
@@ -104,7 +108,8 @@ const Provider = (props) => {
         unsplashUrlTemp,
         setUnsplashName,
         unsplashUrl,
-        setUnsplashUrl,unsplashItem,
+        setUnsplashUrl,
+        unsplashItem,
         handleUnsplashSaved,
         handleUnsplashRestore,
         savedText,
