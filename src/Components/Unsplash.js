@@ -74,7 +74,7 @@ function Location() {
             fontSize: '0.7rem',
             marginTop: 10,
             display: 'flex',
-            justifyContent: 'center',
+            justifyContent: x === 'center' ? x : flexStyleX,
             order: y === 'bottom' && -1,
           }}
         >
