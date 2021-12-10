@@ -16,8 +16,9 @@ function Location() {
     handleUnsplashRestore,
     unsplashItem,
     savedText,
+    savedCue,
   } = useContext(Context);
-  const { id, x, canDrop, flexStyleX } = useContext(ItemContext);
+  const { id, x, y, canDrop, flexStyleX } = useContext(ItemContext);
   const loaderText = useLoaderText(state.loadingImage, x === 'center' && '1em');
   const { ErrorMessage, errorDisplay } = useErrorMessage(state);
   return (
@@ -66,26 +67,23 @@ function Location() {
           ))}
       {state.data && !state.loadingImage && (
         <div
+          className='unsplash-storage-controls'
           style={{
             color: theme.color + 'cc',
             cursor: 'pointer',
-            marginLeft: 10,
             fontSize: '0.7rem',
             marginTop: 10,
             display: 'flex',
             justifyContent: 'center',
+            order: y === 'bottom' && -1,
           }}
         >
-          <p
-            className='unsplash-link'
-            onClick={handleUnsplashSaved}
-            onMouseEnter={(e) => {
-              if (savedText === 'Saved!') e.target.innerHTML = 'Forget';
-            }}
-            onMouseLeave={(e) => (e.target.innerHTML = savedText)}
-          >
-            {savedText}
-          </p>
+          <div>
+            <p className='unsplash-link' onClick={handleUnsplashSaved}>
+              {savedText ? 'Forget' : 'Save'}
+            </p>
+            {savedCue && <p className='unsplash-saved-cue'>Saved!</p>}
+          </div>
           <p
             className='unsplash-link'
             style={{ marginLeft: 10 }}

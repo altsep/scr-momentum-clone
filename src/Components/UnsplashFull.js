@@ -79,7 +79,8 @@ export const LocationFull = ({ id, x, state, setQuery, theme, char }) => (
                 justifyContent: 'start',
                 color: theme.color,
                 fontSize: '0.7em',
-                marginTop: 10,
+                marginTop:
+                  (state.data.exif.make || state.data.exif.model) && 10,
               }}
             >
               {!/canon|nikon/i.test(state.data.exif.make) &&
@@ -114,11 +115,14 @@ export const LocationFull = ({ id, x, state, setQuery, theme, char }) => (
           style={{
             gridColumn: '2 / 3',
             gridRow: '2 / 3',
-            opacity: 0.8,
             marginLeft: 20,
           }}
         >
-          <img className='unsplash-link__image' src={state.data.user.profile_image.medium} alt='' />
+          <img
+            className='unsplash-link__image'
+            src={state.data.user.profile_image.medium}
+            alt=''
+          />
         </a>
       </div>
     )}

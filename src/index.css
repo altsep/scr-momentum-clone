@@ -88,8 +88,19 @@ body {
   text-decoration: underline;
 }
 
+.unsplash-link__image {
+  opacity: 0.8;
+}
+
 .unsplash-link__image:hover {
-  opacity: 0.7;
+  opacity: 1;
+}
+
+.unsplash-saved-cue {
+  z-index: -1;
+  position: absolute;
+  transform: translateY(-100%);
+  animation: saved 2s ease-out forwards;
 }
 
 @media (max-height: 720px) and (max-width: 700px) {
@@ -110,5 +121,16 @@ body {
   }
   .name-hidden-input {
     outline: none;
+  }
+}
+
+@keyframes saved {
+  from {
+    transform: translateY(-125%);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-325%);
+    opacity: 0;
   }
 }

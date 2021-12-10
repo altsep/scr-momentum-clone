@@ -6,7 +6,8 @@ const Provider = (props) => {
   const [unsplashName, setUnsplashName] = useState('');
   const [unsplashUrl, setUnsplashUrl] = useState('');
   const [unsplashItem, setUnsplashItem] = useState(null);
-  const [savedText, setSavedText] = useState('Save');
+  const [savedText, setSavedText] = useState(false);
+  const [savedCue, setSavedCue] = useState(false);
 
   const { state, setState, handleBool } = useFetch(unsplashUrl);
 
@@ -17,7 +18,7 @@ const Provider = (props) => {
     const keyword = localStorage.getItem('imageThemeName');
     if (saved) {
       setState((s) => ({ ...s, data: saved }));
-      setSavedText('Saved!');
+      setSavedText(true);
     } else if (keyword) setUnsplashUrl(unsplashUrlTemp + `&query=${keyword}`);
     else {
       setUnsplashUrl(unsplashUrlTemp);
@@ -33,10 +34,12 @@ const Provider = (props) => {
     const item = JSON.parse(localStorage.getItem('imageSaved'));
     if (item) {
       localStorage.removeItem('imageSaved');
-      setSavedText('Save');
+      setSavedText(false);
     } else if (state.data) {
       localStorage.setItem('imageSaved', JSON.stringify(state.data));
-      setSavedText('Saved!');
+      setSavedText(true);
+      setSavedCue(true);
+      setTimeout(() => setSavedCue(false), 2000);
     }
   };
 
@@ -113,6 +116,8 @@ const Provider = (props) => {
         handleUnsplashSaved,
         handleUnsplashRestore,
         savedText,
+        savedCue,
+        setSavedCue,
         awkwardLoading,
         setAwkwardLoading,
         pseudoLoadingTimeout,

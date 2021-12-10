@@ -33,15 +33,16 @@ function Background() {
       setAwkwardLoading(false);
       setLoadingTimeout(false);
     }
-    const timeoutId = setTimeout(() => {
-      setAwkwardLoading(false);
-      !state.loadingImage &&
-      typeof url !== 'string' &&
-      state.errorDetails === 'Failed to fetch'
-        ? setLoadingTimeout(true)
-        : setLoadingTimeout(false);
-    }, 500);
-    return () => clearTimeout(timeoutId);
+    // Limit loader image display time
+    // const timeoutId = setTimeout(() => {
+    //   setAwkwardLoading(false);
+    //   !state.loadingImage &&
+    //   typeof url !== 'string' &&
+    //   state.errorDetails === 'Failed to fetch'
+    //     ? setLoadingTimeout(true)
+    //     : setLoadingTimeout(false);
+    // }, 500);
+    // return () => clearTimeout(timeoutId);
   }, [state.loadingImage, url, pseudoLoadingTimeout, setAwkwardLoading]);
 
   const loaderText = useLoaderText(awkwardLoading, '1.5rem');
