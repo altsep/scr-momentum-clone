@@ -15,88 +15,112 @@ export const LocationFull = ({ id, x, state, setQuery, theme, char }) => (
       x={x}
       state={state}
       setQuery={setQuery}
-      titleText={state.data.location.title || '?'}
       theme={theme}
       char={char}
     />
-    <div
-      className='border-line details'
-      style={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        marginTop: 20,
-        paddingTop: 20,
-        borderTop: theme.border,
-      }}
-    >
+    {state.data && (
       <div
+        className='border-line details'
         style={{
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
+          justifyContent: 'space-around',
           alignItems: 'center',
-          fontSize: '0.7em',
+          marginTop: 20,
+          paddingTop: 20,
+          borderTop: theme.border,
         }}
       >
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'start',
+            alignItems: 'center',
+            fontSize: '0.7em',
           }}
         >
-          <a
-            href={
-              state.data.user.instagram_username
-                ? `https://www.instagram.com/${state.data.user.instagram_username}`
-                : undefined
-            }
-            target='_blank'
-            rel='noreferrer'
-            style={{
-              textDecoration: 'none',
-              color: theme.color,
-            }}
-          >
-            {state.data.user
-              ? state.data.user.instagram_username || state.data.user.name
-              : '?'}
-          </a>
           <div
             style={{
               display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'start',
-              fontSize: '0.7em',
-              marginTop: 10,
+              flexDirection: 'column',
+              alignItems: 'start',
             }}
           >
-            {!/canon|nikon/i.test(state.data.exif.make) &&
-              typeof state.data.exif.make === 'string' && (
-                <p>{state.data.exif.make}&nbsp;</p>
-              )}
-            <p>{state.data.exif.model}</p>
+            <a
+              className='unsplash-link'
+              href={
+                state.data.user.instagram_username
+                  ? `https://www.instagram.com/${state.data.user.instagram_username}`
+                  : undefined
+              }
+              target='_blank'
+              rel='noreferrer'
+              style={{
+                color: theme.color,
+              }}
+            >
+              {state.data.user
+                ? state.data.user.instagram_username || state.data.user.name
+                : '?'}
+            </a>
+            <a
+              className='unsplash-link'
+              href={`https://www.google.com/search?q=${
+                !/canon|nikon/i.test(state.data.exif.make) &&
+                typeof state.data.exif.make === 'string'
+                  ? state.data.exif.make + ' '
+                  : ''
+              }${state.data.exif.model}`}
+              target='_blank'
+              rel='noreferrer'
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'start',
+                color: theme.color,
+                fontSize: '0.7em',
+                marginTop: 10,
+              }}
+            >
+              {!/canon|nikon/i.test(state.data.exif.make) &&
+                typeof state.data.exif.make === 'string' && (
+                  <p>{state.data.exif.make}&nbsp;</p>
+                )}
+              <p>{state.data.exif.model}</p>
+            </a>
+            <a
+              className='unsplash-link'
+              href={state.data.links.html}
+              target='_blank'
+              rel='noreferrer'
+              style={{
+                color: theme.color,
+                fontSize: '0.7em',
+                marginTop: 10,
+              }}
+            >
+              {state.data.links.html ? '[unsplash]' : undefined}
+            </a>
           </div>
         </div>
+        <a
+          href={
+            state.data.user.instagram_username
+              ? `https://www.instagram.com/${state.data.user.instagram_username}`
+              : undefined
+          }
+          target='_blank'
+          rel='noreferrer'
+          style={{
+            gridColumn: '2 / 3',
+            gridRow: '2 / 3',
+            opacity: 0.8,
+            marginLeft: 20,
+          }}
+        >
+          <img className='unsplash-link__image' src={state.data.user.profile_image.medium} alt='' />
+        </a>
       </div>
-      <a
-        href={
-          state.data.user.instagram_username
-            ? `https://www.instagram.com/${state.data.user.instagram_username}`
-            : undefined
-        }
-        target='_blank'
-        rel='noreferrer'
-        style={{
-          gridColumn: '2 / 3',
-          gridRow: '2 / 3',
-          opacity: 0.8,
-          marginLeft: 20,
-        }}
-      >
-        <img src={state.data.user.profile_image.medium} alt='' />
-      </a>
-    </div>
+    )}
   </div>
 );

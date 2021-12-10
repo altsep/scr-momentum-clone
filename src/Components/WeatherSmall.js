@@ -44,7 +44,6 @@ export const WeatherSmall = ({ props }) => {
           lineHeight: 1.5,
           display: 'flex',
           flexDirection: 'row',
-          flexWrap: 'wrap',
           justifyContent: flexStyleX,
           alignItems: 'center',
         }}

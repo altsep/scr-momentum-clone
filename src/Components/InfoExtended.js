@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ControlsList } from './InfoControlsList';
+import { controls } from '../Misc/Text';
 import styled from 'styled-components';
 
 export const InfoExtended = ({
@@ -65,7 +65,9 @@ export const InfoExtended = ({
         scroll={scroll}
         infoStatus={infoStatus}
       >
-        <ControlsList />
+        {controls.split('. ').map((a, i) => (
+          <li key={i}>{a}</li>
+        ))}
       </ControlsListContainer>
     </div>
   );

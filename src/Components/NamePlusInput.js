@@ -124,7 +124,7 @@ const NamePlusInput = ({ id, x, state, setQuery, theme, char }) => {
         )}
       >
         <input
-          className='name-hidden-input'
+          className={'name-hidden-input ' + theme.name}
           style={{
             display: inputDisplay,
             color: theme.color,
@@ -134,7 +134,7 @@ const NamePlusInput = ({ id, x, state, setQuery, theme, char }) => {
             height: '1.75rem',
             maxWidth: '10rem',
             background: 'transparent',
-          }}
+          }}          
           ref={inputRef}
           type='text'
           name='name'

@@ -10,11 +10,11 @@ export const useFetch = (url) => {
     active: false,
   });
 
-  const handleBool = (key, bool, reload) => {
+  const handleBool = (key, val, reload) => {
     setState((state) => {
       let result = { ...state };
       if (reload) result[key] = !result[key];
-      else result[key] = bool;
+      else result[key] = val;
       return result;
     });
   };
@@ -53,11 +53,19 @@ export const useFetch = (url) => {
         ) {
           console.log('Duplicate url found, repeating request.');
           handleBool('active', null, true);
-        } else
+        } else if (z)
           setState((state) => ({
             ...state,
             data: z,
             loading: false,
+            // loadingImage: false,
+          }));
+        else
+          setState((state) => ({
+            ...state,
+            data: state.data,
+            loading: false,
+            // loadingImage: false,
           }));
       })
       .catch((err) => {

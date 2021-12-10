@@ -68,58 +68,53 @@ export const WeatherFull = ({ props }) => {
             flexDirection: 'row',
             justifyContent: 'space-around',
             alignItems: 'center',
-            borderTop: theme.border,
+            borderTop: state.data && theme.border,
           }}
         >
           <div className='title'>
-            <>
-              {state.data !== null && (
-                <NamePlusInput
-                  id={id}
-                  x={x}
-                  state={state}
-                  setQuery={setQuery}
-                  theme={theme}
-                  char={char}
-                />
-              )}
-            </>
+            <NamePlusInput
+              id={id}
+              x={x}
+              state={state}
+              setQuery={setQuery}
+              theme={theme}
+              char={char}
+            />
           </div>
           {iconWithProps}
         </div>
       </div>
-      <div
-        className='weather details border-line'
-        style={{
-          marginLeft: 30,
-          paddingLeft: 30,
-          fontSize: '1em',
-          fontWeight: '100',
-          lineHeight: 2,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: flexStyleY,
-          borderLeft: theme.border,
-          width: '50%',
-          textAlign: 'start',
-        }}
-        onClick={handleClick}
-      >
-        {state.data && (
-          <>
-            <p
-              style={{
-                textTransform: 'capitalize',
-              }}
-            >
-              {state.data.weather[0].description}
-            </p>
-            <p>{wind}</p>
-            <p>{state.data.main.humidity}%</p>
-            <p>{state.data.main.pressure}hPa</p>
-          </>
-        )}
-      </div>
+      {state.data && (
+        <div
+          className='weather details border-line'
+          style={{
+            marginLeft: 30,
+            paddingLeft: 30,
+            fontSize: '1em',
+            fontWeight: '100',
+            lineHeight: 2,
+            display: state.data ? 'flex' : 'none',
+            flexDirection: 'column',
+            justifyContent: flexStyleY,
+            borderLeft: theme.border,
+            width: '50%',
+            textAlign: 'start',
+          }}
+          onClick={handleClick}
+        >
+          <p
+            style={{
+              width: '6em',
+              textTransform: 'capitalize',
+            }}
+          >
+            {state.data.weather[0].description}
+          </p>
+          <p>{wind}</p>
+          <p>{state.data.main.humidity}%</p>
+          <p>{state.data.main.pressure}hPa</p>
+        </div>
+      )}
     </div>
   );
 };

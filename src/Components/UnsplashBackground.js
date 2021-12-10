@@ -5,7 +5,16 @@ import { useLoaderText } from '../Hooks/useLoaderText';
 
 function Background() {
   const [url, setUrl] = useState();
-  const { state, handleBool } = useContext(Context);
+  const {
+    state,
+    handleBool,
+    unsplashUrl,
+    setUnsplashUrl,
+    unsplashUrlTemp,
+    awkwardLoading,
+    setAwkwardLoading,
+    pseudoLoadingTimeout,
+  } = useContext(Context);
 
   // Urls object keys:
   // raw, full, regular, small, thumb
@@ -13,10 +22,6 @@ function Background() {
     state.data && setUrl(state.data.urls.full);
   }, [state]);
 
-  // Provide initial loader
-  const { awkwardLoading, setAwkwardLoading } = useContext(Context);
-
-  const { pseudoLoadingTimeout } = useContext(Context);
   const [loadingTimeout, setLoadingTimeout] = useState(false);
 
   // Determite initial loader's fate
@@ -45,6 +50,15 @@ function Background() {
   const doublePressRef = useRef(false);
   const doublePressRefAvailable = useRef(true);
 
+  const handleUpdate = () => {
+    const keyword = localStorage.getItem('imageThemeName');
+    if (unsplashUrl) handleBool('active', null, true);
+    else if (keyword) setUnsplashUrl(unsplashUrlTemp + `&query=${keyword}`);
+    else {
+      setUnsplashUrl(unsplashUrlTemp);
+    }
+  };
+
   useEffect(() => {
     const onKeyUp = (e) => {
       if (e.key.toLowerCase() === 'b' && !doublePressRef.current) {
@@ -55,7 +69,7 @@ function Background() {
         doublePressRef.current &&
         doublePressRefAvailable.current
       ) {
-        handleBool('active', null, true);
+        handleUpdate();
         doublePressRef.current = false;
         doublePressRefAvailable.current = false;
         setTimeout(() => (doublePressRefAvailable.current = true), 500);
@@ -65,7 +79,7 @@ function Background() {
     return () => {
       document.removeEventListener('keyup', onKeyUp);
     };
-  }, []);
+  }, [handleUpdate]);
 
   return (
     <>
@@ -129,7 +143,7 @@ function Background() {
           // e.target.onerror = null;
           // e.target.src = lake;
         }}
-        onDoubleClick={() => handleBool('active', null, true)}
+        onDoubleClick={handleUpdate}
       />
       {state.error && (
         <div

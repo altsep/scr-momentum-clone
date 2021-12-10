@@ -29,12 +29,19 @@ body {
   letter-spacing: 0.1rem;
 }
 
-input:focus {
+.name-hidden-input:focus {
   opacity: 0.9;
 }
 
-input::placeholder {
+.name-hidden-input::placeholder {
   font-size: 0.9em;
+}
+
+.name-hidden-input.normal::placeholder {
+  color: #ffffffc4;
+}
+
+.name-hidden-input .awkward::placeholder {
   color: #f1f1f1a8;
 }
 
@@ -71,6 +78,18 @@ input::placeholder {
 .crypto-icon-link:hover {
   background-color: rgba(43, 43, 43, 0.6);
   border-radius: 100%;
+}
+
+.unsplash-link {
+  text-decoration: none;
+}
+
+.unsplash-link:hover {
+  text-decoration: underline;
+}
+
+.unsplash-link__image:hover {
+  opacity: 0.7;
 }
 
 @media (max-height: 720px) and (max-width: 700px) {

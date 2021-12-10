@@ -45,7 +45,6 @@ function App() {
             el={el.el}
             id={el.id}
             key={el.id}
-            i={i}
             responsiveIndex={itemList
               .filter((a) => a.id !== 'location' && a.id !== 'info' && a.id)
               .map((a) => a.id)

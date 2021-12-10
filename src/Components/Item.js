@@ -7,7 +7,7 @@ const ItemTypes = {
 };
 
 function Item(props) {
-  const { x, y, id, i, el, infoExpanded, windowDimensions, responsiveIndex } =
+  const { x, y, id, el, infoExpanded, windowDimensions, responsiveIndex } =
     props;
 
   const [{ isDragging }, drag] = useDrag(() => ({

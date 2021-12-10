@@ -5,17 +5,41 @@ const Provider = (props) => {
   // fetch unsplash
   const [unsplashName, setUnsplashName] = useState('');
   const [unsplashUrl, setUnsplashUrl] = useState('');
+  const [unsplashItem, setUnsplashItem] = useState({});
+  const [savedText, setSavedText] = useState('Save');
 
   const { state, setState, handleBool } = useFetch(unsplashUrl);
 
   const unsplashUrlTemp =
     'https://apis.scrimba.com/unsplash/photos/random?orientation=landscape';
   useEffect(() => {
-    const item = localStorage.getItem('imageThemeName');
-    if (item) {
-      setUnsplashUrl(unsplashUrlTemp + `&query=${item}`);
-    } else setUnsplashUrl(unsplashUrlTemp);
+    const saved = JSON.parse(localStorage.getItem('imageSaved'));
+    const keyword = localStorage.getItem('imageThemeName');
+    if (saved) {
+      setState((s) => ({ ...s, data: saved }));
+      setSavedText('Saved!');
+      setUnsplashItem(saved);
+    } else if (keyword) setUnsplashUrl(unsplashUrlTemp + `&query=${keyword}`);
+    else {
+      setUnsplashUrl(unsplashUrlTemp);
+    }
   }, []);
+
+  const handleUnsplashSaved = () => {
+    const item = JSON.parse(localStorage.getItem('imageSaved'));
+    if (item) {
+      localStorage.removeItem('imageSaved');
+      setSavedText('Save');
+    } else if (state.data) {
+      localStorage.setItem('imageSaved', JSON.stringify(state.data));
+      setSavedText('Saved!');
+    }
+  };
+
+  const handleUnsplashRestore = () => {
+    const item = JSON.parse(localStorage.getItem('imageSaved'));
+    item && setState((s) => ({ ...s, data: item }));
+  };
 
   useEffect(() => {
     if (unsplashName) {
@@ -77,7 +101,13 @@ const Provider = (props) => {
       value={{
         state,
         handleBool,
+        unsplashUrlTemp,
         setUnsplashName,
+        unsplashUrl,
+        setUnsplashUrl,unsplashItem,
+        handleUnsplashSaved,
+        handleUnsplashRestore,
+        savedText,
         awkwardLoading,
         setAwkwardLoading,
         pseudoLoadingTimeout,

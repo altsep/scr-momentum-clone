@@ -15,7 +15,6 @@ export const LocationSmall = ({
       x={x}
       state={state}
       setQuery={setQuery}
-      titleText={state.data.location.title || '?'}
       theme={theme}
       char={char}
     />
