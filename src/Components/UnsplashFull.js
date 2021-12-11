@@ -1,6 +1,6 @@
 import NamePlusInput from './NamePlusInput';
 
-export const LocationFull = ({ id, x, state, setQuery, theme, char }) => (
+export const LocationFull = ({ state, setQuery, theme, char }) => (
   <div
     style={{
       placeSelf: 'center',
@@ -11,8 +11,6 @@ export const LocationFull = ({ id, x, state, setQuery, theme, char }) => (
     }}
   >
     <NamePlusInput
-      id={id}
-      x={x}
       state={state}
       setQuery={setQuery}
       theme={theme}

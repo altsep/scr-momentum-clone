@@ -6,11 +6,9 @@ export const WeatherFull = ({ props }) => {
     temp,
     feels,
     wind,
-    x,
     flexStyleX,
     flexStyleY,
     iconWithProps,
-    id,
     setQuery,
     theme,
     char,
@@ -73,8 +71,6 @@ export const WeatherFull = ({ props }) => {
         >
           <div className='title'>
             <NamePlusInput
-              id={id}
-              x={x}
               state={state}
               setQuery={setQuery}
               theme={theme}

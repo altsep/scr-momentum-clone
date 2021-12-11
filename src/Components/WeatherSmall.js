@@ -5,11 +5,9 @@ export const WeatherSmall = ({ props }) => {
     state,
     temp,
     wind,
-    x,
     flexStyleX,
     flexStyleY,
     iconWithProps,
-    id,
     setQuery,
     theme,
     char,
@@ -31,8 +29,6 @@ export const WeatherSmall = ({ props }) => {
     >
       <div className='weather title'>
         <NamePlusInput
-          id={id}
-          x={x}
           state={state}
           setQuery={setQuery}
           theme={theme}

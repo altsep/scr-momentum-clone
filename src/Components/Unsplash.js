@@ -15,8 +15,8 @@ function Location() {
     handleUnsplashSaved,
     handleUnsplashRestore,
     unsplashItem,
-    savedText,
-    savedCue,
+    savedText: isSaved,
+    savedCue: savedCueDisplay,
   } = useContext(Context);
   const { id, x, y, canDrop, flexStyleX } = useContext(ItemContext);
   const loaderText = useLoaderText(state.loadingImage, x === 'center' && '1em');
@@ -80,9 +80,9 @@ function Location() {
         >
           <div>
             <p className='unsplash-link' onClick={handleUnsplashSaved}>
-              {savedText ? 'Forget' : 'Save'}
+              {isSaved ? 'Forget' : 'Save'}
             </p>
-            {savedCue && <p className='unsplash-saved-cue'>Saved!</p>}
+            {savedCueDisplay && <p className='unsplash-saved-cue'>Saved!</p>}
           </div>
           <p
             className='unsplash-link'

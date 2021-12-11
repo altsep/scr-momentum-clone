@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { ItemContext } from './Item';
 
-const NamePlusInput = ({ id, x, state, setQuery, theme, char }) => {
+const NamePlusInput = ({ state, setQuery, theme, char }) => {
   const [titleName, setTitleName] = useState('');
   const [titleValue, setTitleValue] = useState(titleName || '');
+  const { id, x, setHasActiveInput } = useContext(ItemContext);
 
   useEffect(
     () =>
@@ -134,7 +136,7 @@ const NamePlusInput = ({ id, x, state, setQuery, theme, char }) => {
             height: '1.75rem',
             maxWidth: '10rem',
             background: 'transparent',
-          }}          
+          }}
           ref={inputRef}
           type='text'
           name='name'
@@ -148,12 +150,14 @@ const NamePlusInput = ({ id, x, state, setQuery, theme, char }) => {
           }}
           onFocus={() => {
             setTitleValue('');
+            setHasActiveInput(true);
           }}
           onBlur={(e) => {
             // e.target.style.display = 'none';
             // titleRef.current.style.display = 'block';
             setInputDisplay('none');
             setTitleDisplay('block');
+            setHasActiveInput(false);
           }}
         />
         <button

@@ -1,8 +1,6 @@
 import NamePlusInput from './NamePlusInput';
 
 export const LocationSmall = ({
-  id,
-  x,
   state,
   theme,
   setQuery,
@@ -11,8 +9,6 @@ export const LocationSmall = ({
 }) => (
   <div style={{ placeSelf: flexStyleX }}>
     <NamePlusInput
-      id={id}
-      x={x}
       state={state}
       setQuery={setQuery}
       theme={theme}

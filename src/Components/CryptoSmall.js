@@ -3,7 +3,6 @@ import NamePlusInput from './NamePlusInput';
 import { Details } from './CryptoDetails';
 
 export const CryptoSmall = ({
-  id,
   x,
   flexStyleX,
   flexStyleY,
@@ -32,8 +31,6 @@ export const CryptoSmall = ({
         justifyContent: flexStyleY,
         alignItems: 'center',
       }}
-      onMouseEnter={() => handleHovered('logo', true)}
-      onMouseLeave={() => handleHovered('logo', false)}
     >
       {state.data && (
         <a
@@ -45,6 +42,8 @@ export const CryptoSmall = ({
             color: theme.color,
             display: 'grid',
           }}
+          onMouseEnter={() => handleHovered('logo', true)}
+          onMouseLeave={() => handleHovered('logo', false)}
         >
           <Logo
             state={state}
@@ -57,8 +56,6 @@ export const CryptoSmall = ({
       )}
       &nbsp;
       <NamePlusInput
-        id={id}
-        x={x}
         state={state}
         setQuery={setCryptoName}
         theme={theme}

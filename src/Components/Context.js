@@ -6,8 +6,8 @@ const Provider = (props) => {
   const [unsplashName, setUnsplashName] = useState('');
   const [unsplashUrl, setUnsplashUrl] = useState('');
   const [unsplashItem, setUnsplashItem] = useState(null);
-  const [savedText, setSavedText] = useState(false);
-  const [savedCue, setSavedCue] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [savedCueDisplay, setSavedCueDisplay] = useState(false);
 
   const { state, setState, handleBool } = useFetch(unsplashUrl);
 
@@ -18,7 +18,7 @@ const Provider = (props) => {
     const keyword = localStorage.getItem('imageThemeName');
     if (saved) {
       setState((s) => ({ ...s, data: saved }));
-      setSavedText(true);
+      setIsSaved(true);
     } else if (keyword) setUnsplashUrl(unsplashUrlTemp + `&query=${keyword}`);
     else {
       setUnsplashUrl(unsplashUrlTemp);
@@ -28,18 +28,18 @@ const Provider = (props) => {
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem('imageSaved'));
     setUnsplashItem(saved);
-  }, [savedText]);
+  }, [isSaved]);
 
   const handleUnsplashSaved = () => {
     const item = JSON.parse(localStorage.getItem('imageSaved'));
     if (item) {
       localStorage.removeItem('imageSaved');
-      setSavedText(false);
+      setIsSaved(false);
     } else if (state.data) {
       localStorage.setItem('imageSaved', JSON.stringify(state.data));
-      setSavedText(true);
-      setSavedCue(true);
-      setTimeout(() => setSavedCue(false), 2000);
+      setIsSaved(true);
+      setSavedCueDisplay(true);
+      setTimeout(() => setSavedCueDisplay(false), 2000);
     }
   };
 
@@ -115,9 +115,9 @@ const Provider = (props) => {
         unsplashItem,
         handleUnsplashSaved,
         handleUnsplashRestore,
-        savedText,
-        savedCue,
-        setSavedCue,
+        savedText: isSaved,
+        savedCue: savedCueDisplay,
+        setSavedCue: setSavedCueDisplay,
         awkwardLoading,
         setAwkwardLoading,
         pseudoLoadingTimeout,

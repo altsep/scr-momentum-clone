@@ -53,10 +53,7 @@ function Item(props) {
   const dragDropRef = drag(drop(ref));
 
   //----
-  const {
-    awkwardLoading,
-    theme,
-  } = useContext(Context);
+  const { awkwardLoading, theme } = useContext(Context);
 
   const [itemsHidden, setItemsHidden] = useState(false);
 
@@ -71,6 +68,8 @@ function Item(props) {
     [width, height]
   );
 
+  const [hasActiveInput, setHasActiveInput] = useState(false);
+
   const itemStyle = Object.assign(
     {
       zIndex: '1',
@@ -83,12 +82,14 @@ function Item(props) {
         : canDrop && theme.name === 'awkward'
         ? '2px dashed #2b2b2b'
         : canDrop && '2px dashed #eaeaea',
+      borderRadius: 10,
       justifySelf: x === 'left' ? 'start' : 'end',
       alignSelf: y === 'top' ? 'start' : 'end',
       display: 'grid',
       maxWidth: window.innerWidth / 2 - 20,
       maxHeight: '95%',
       gridRow: y === 'bottom' && '3 / 4',
+      backgroundColor: hasActiveInput && '#00000044',
     },
     canDrop && {
       margin: 10,
@@ -111,6 +112,7 @@ function Item(props) {
         : canDrop && theme.name === 'awkward'
         ? '2px dashed #2b2b2b'
         : canDrop && '2px dashed #eaeaea',
+      borderRadius: 20,
       gridColumn: '1 / 3',
       gridRow: '2 / 3',
       placeSelf: 'center',
@@ -118,9 +120,8 @@ function Item(props) {
       display: 'grid',
       maxWidth: window.innerWidth - 24,
       maxHeight: '95%',
-      borderRadius: 20,
       padding: 50,
-      backgroundColor: infoExpanded && '#00000000',
+      backgroundColor: hasActiveInput && '#00000044',
     },
     canDrop && {
       borderRadius: 0,
@@ -220,6 +221,7 @@ function Item(props) {
         flexStyleY: windowSmall ? 'center' : flexStyleY,
         windowSmall,
         windowDimensions: props.windowDimensions,
+        setHasActiveInput,
       }}
     >
       <div

@@ -4,7 +4,6 @@ import { Details } from './CryptoDetails';
 import { Logo } from './CryptoLogo';
 
 export const CryptoFull = ({
-  id,
   x,
   canDrop,
   state,
@@ -56,8 +55,6 @@ export const CryptoFull = ({
         </a>
       )}
       <NamePlusInput
-        id={id}
-        x={x}
         state={state}
         setQuery={setCryptoName}
         theme={theme}
