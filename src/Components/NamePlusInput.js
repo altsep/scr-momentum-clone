@@ -96,7 +96,7 @@ const NamePlusInput = ({ id, x, state, setQuery, theme, char }) => {
           opacity: !state.data && 0.8,
           fontStyle: !state.data && 'italic',
           fontSize: !state.data && '80%',
-          textDecoration: !state.data && 'underline',
+          cursor: 'pointer',
         }}
         onClick={handleNameDisplay}
       >

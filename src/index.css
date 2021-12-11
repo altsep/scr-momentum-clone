@@ -24,21 +24,73 @@ body {
   padding: 0;
 }
 
-.title {
+.name-container .name {
   font-family: 'Merriweather', sans-serif;
   letter-spacing: 0.1rem;
+}
+
+.name-container .name:hover {
+  opacity: 0.7;
 }
 
 .name-hidden-input:focus {
   opacity: 0.9;
 }
 
+.name-hidden-input::-webkit-input-placeholder {
+  font-size: 0.9em;
+}
+
+.name-hidden-input::-moz-placeholder {
+  font-size: 0.9em;
+}
+
+.name-hidden-input:-ms-input-placeholder {
+  font-size: 0.9em;
+}
+
+.name-hidden-input::-ms-input-placeholder {
+  font-size: 0.9em;
+}
+
 .name-hidden-input::placeholder {
   font-size: 0.9em;
 }
 
+.name-hidden-input.normal::-webkit-input-placeholder {
+  color: #ffffffc4;
+}
+
+.name-hidden-input.normal::-moz-placeholder {
+  color: #ffffffc4;
+}
+
+.name-hidden-input.normal:-ms-input-placeholder {
+  color: #ffffffc4;
+}
+
+.name-hidden-input.normal::-ms-input-placeholder {
+  color: #ffffffc4;
+}
+
 .name-hidden-input.normal::placeholder {
   color: #ffffffc4;
+}
+
+.name-hidden-input .awkward::-webkit-input-placeholder {
+  color: #f1f1f1a8;
+}
+
+.name-hidden-input .awkward::-moz-placeholder {
+  color: #f1f1f1a8;
+}
+
+.name-hidden-input .awkward:-ms-input-placeholder {
+  color: #f1f1f1a8;
+}
+
+.name-hidden-input .awkward::-ms-input-placeholder {
+  color: #f1f1f1a8;
 }
 
 .name-hidden-input .awkward::placeholder {
@@ -52,10 +104,14 @@ body {
 }
 
 .crypto.details.left {
+  -webkit-box-align: start;
+  -ms-flex-align: start;
   align-items: start;
 }
 
 .crypto.details.right {
+  -webkit-box-align: end;
+  -ms-flex-align: end;
   align-items: end;
 }
 
@@ -64,10 +120,14 @@ body {
 }
 
 .icon-switch {
+  -webkit-transform: scale(1.2);
+  -ms-transform: scale(1.2);
   transform: scale(1.2);
 }
 
 .icon-refresh {
+  -webkit-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
   transform: rotate(-45deg);
 }
 
@@ -99,7 +159,10 @@ body {
 .unsplash-saved-cue {
   z-index: -1;
   position: absolute;
+  -webkit-transform: translateY(-100%);
+  -ms-transform: translateY(-100%);
   transform: translateY(-100%);
+  -webkit-animation: saved 2s ease-out forwards;
   animation: saved 2s ease-out forwards;
 }
 
@@ -124,12 +187,27 @@ body {
   }
 }
 
-@keyframes saved {
+@-webkit-keyframes saved {
   from {
+    -webkit-transform: translateY(-125%);
     transform: translateY(-125%);
     opacity: 1;
   }
   to {
+    -webkit-transform: translateY(-325%);
+    transform: translateY(-325%);
+    opacity: 0;
+  }
+}
+
+@keyframes saved {
+  from {
+    -webkit-transform: translateY(-125%);
+    transform: translateY(-125%);
+    opacity: 1;
+  }
+  to {
+    -webkit-transform: translateY(-325%);
     transform: translateY(-325%);
     opacity: 0;
   }

@@ -1,6 +1,5 @@
 export const Details = ({
   state,
-  handleHovered,
   hovered,
   x,
   currencyName,
@@ -14,8 +13,6 @@ export const Details = ({
         gridTemplateRows: '1fr',
         gap: 20,
       }}
-      onMouseEnter={() => handleHovered('details', true)}
-      onMouseLeave={() => handleHovered('details', false)}
     >
       <div
         className={`crypto details ${x}`}
@@ -59,7 +56,7 @@ export const Details = ({
         style={{
           gridColumn: x === 'right' ? '1 / 2' : '2 / 3',
           gridRow: '1 / 2',
-          isplay: 'flex',
+          display: 'flex',
           flexDirection: 'column',
           opacity: hovered.details || windowSmall ? 0.8 : 0,
         }}

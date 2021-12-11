@@ -68,6 +68,8 @@ function Crypto() {
         display: 'grid',
         justifyContent: flexStyleX,
       }}
+      onMouseEnter={() => handleHovered('details', true)}
+      onMouseLeave={() => handleHovered('details', false)}
     >
       {state.loading ? (
         loaderText
