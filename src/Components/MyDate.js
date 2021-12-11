@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Context } from './Context';
 import { ItemContext } from './Item';
 import ControlsSwitch from '../Misc/ControlsSwitch';
 import { IconSwitch } from '../Misc/Icons';
