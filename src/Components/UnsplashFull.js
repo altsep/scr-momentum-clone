@@ -55,6 +55,7 @@ export const LocationFull = ({ state, setQuery, theme, char }) => (
               rel='noreferrer'
               style={{
                 color: theme.color,
+                textDecoration: !state.data.user.instagram_username && 'none'
               }}
             >
               {state.data.user
@@ -120,6 +121,7 @@ export const LocationFull = ({ state, setQuery, theme, char }) => (
             className='unsplash-link__image'
             src={state.data.user.profile_image.medium}
             alt=''
+            style={{opacity: !state.data.user.instagram_username && 0.8}}
           />
         </a>
       </div>

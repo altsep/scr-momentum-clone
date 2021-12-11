@@ -92,6 +92,7 @@ function Item(props) {
       backgroundColor: hasActiveInput && '#00000044',
     },
     canDrop && {
+      borderRadius: 0,
       margin: 10,
       height: '100%',
       width: '100%',
