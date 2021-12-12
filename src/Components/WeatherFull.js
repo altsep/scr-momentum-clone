@@ -60,8 +60,8 @@ export const WeatherFull = ({ props }) => {
         <div
           className='weather border-line'
           style={{
-            marginTop: 30,
-            paddingTop: 10,
+            marginTop: state.data && 30,
+            paddingTop: state.data && 10,
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-around',
@@ -69,14 +69,12 @@ export const WeatherFull = ({ props }) => {
             borderTop: state.data && theme.border,
           }}
         >
-          <div className='title'>
-            <NamePlusInput
-              state={state}
-              setQuery={setQuery}
-              theme={theme}
-              char={char}
-            />
-          </div>
+          <NamePlusInput
+            state={state}
+            setQuery={setQuery}
+            theme={theme}
+            char={char}
+          />
           {iconWithProps}
         </div>
       </div>

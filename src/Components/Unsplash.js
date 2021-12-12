@@ -23,23 +23,14 @@ function Location() {
   const { ErrorMessage, errorDisplay } = useErrorMessage(state);
   return (
     <div
-      id='location'
-      className='details'
-      style={Object.assign(
-        {
-          placeSelf: (canDrop || x === 'center') && 'center',
-          width:
-            state.loadingImage || canDrop ? '6em' : x === 'center' && '12em',
-          textAlign: flexStyleX,
-          fontSize: '1em',
-          display: 'grid',
-        },
-        x === 'center' && {
-          fontSize: '1.4em',
-          display: 'grid',
-          height: '100%',
-        }
-      )}
+      className='location'
+      style={{
+        placeSelf: (canDrop || x === 'center') && 'center',
+        width: state.loadingImage || canDrop ? '6em' : x === 'center' && '12em',
+        textAlign: flexStyleX,
+        fontSize: '1em',
+        display: 'grid',
+      }}
     >
       {!awkwardLoading && state.loadingImage
         ? loaderText
@@ -85,19 +76,21 @@ function Location() {
             </p>
             {savedCueDisplay && <p className='unsplash-saved-cue'>Saved!</p>}
           </div>
-          <p
-            className='unsplash-link'
-            style={{ marginLeft: 10 }}
-            onClick={handleUnsplashRestore}
-          >
-            {unsplashItem && state.data.id !== unsplashItem.id && 'Restore'}
-          </p>
+          {unsplashItem && state.data.id !== unsplashItem.id && (
+            <p
+              className='unsplash-link'
+              style={{ marginLeft: 10 }}
+              onClick={handleUnsplashRestore}
+            >
+              'Restore'
+            </p>
+          )}
         </div>
       )}
-      {state.error && !state.data && errorDisplay ? (
-        <ErrorMessage text="Couldn't load image data" theme={theme} />
+      {!state.data && errorDisplay ? (
+        <ErrorMessage text="Couldn't load image data" />
       ) : (
-        state.error && errorDisplay && <ErrorMessage theme={theme} />
+        state.error && errorDisplay && <ErrorMessage />
       )}
     </div>
   );

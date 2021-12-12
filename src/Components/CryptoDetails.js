@@ -2,6 +2,7 @@ export const Details = ({
   state,
   hovered,
   x,
+  canDrop,
   currencyName,
   windowSmall,
 }) => {
@@ -58,7 +59,7 @@ export const Details = ({
           gridRow: '1 / 2',
           display: 'flex',
           flexDirection: 'column',
-          opacity: hovered.details || windowSmall ? 0.8 : 0,
+          opacity: hovered.details || canDrop || windowSmall ? 0.8 : 0,
         }}
       >
         <p>Current</p>

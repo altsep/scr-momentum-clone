@@ -34,14 +34,13 @@ export const LocationFull = ({ state, setQuery, theme, char }) => (
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            fontSize: '0.7em',
           }}
         >
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'start',
+              alignItems: state.data.user.profile_image.medium ? 'center' : 'start',
             }}
           >
             <a
@@ -114,7 +113,7 @@ export const LocationFull = ({ state, setQuery, theme, char }) => (
           style={{
             gridColumn: '2 / 3',
             gridRow: '2 / 3',
-            marginLeft: 20,
+            marginLeft: !state.error && 20,
           }}
         >
           <img

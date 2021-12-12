@@ -154,14 +154,11 @@ function Background() {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
             color: '#00000080',
             textShadow: 'none',
             fontSize: '5rem',
-            objectFit: 'cover',
             userSelect: 'none',
+            whiteSpace: 'nowrap'
           }}
         >
           （゜;﹏;゜）

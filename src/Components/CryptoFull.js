@@ -31,14 +31,13 @@ export const CryptoFull = ({
         gridRow: '1 / 2',
         display: 'grid',
         placeItems: 'center',
-        fontSize: '1.2em',
       }}
     >
       {state.data && (
         <a
-          style={{
-            alignSelf: 'start',
-          }}
+          // style={{
+          //   alignSelf: 'start',
+          // }}
           href={state.data.links && state.data.links.homepage[0]}
           target='_blank'
           rel='noreferrer'
@@ -65,12 +64,7 @@ export const CryptoFull = ({
       <>
         <div
           style={{
-            alignSelf: 'start',
             gridColumn: '2 / 3',
-            gridRow: '2 / 3',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
           }}
         >
           <a
@@ -78,7 +72,6 @@ export const CryptoFull = ({
             href={`https://twitter.com/${state.data.links.twitter_screen_name}`}
             target='_blank'
             rel='noreferrer'
-            style={iconStyle(hovered.twitter, theme)}
             onMouseEnter={() => handleHovered('twitter', true)}
             onMouseLeave={() => handleHovered('twitter', false)}
           >
@@ -89,7 +82,6 @@ export const CryptoFull = ({
             href={state.data.links.subreddit_url}
             target='_blank'
             rel='noreferrer'
-            style={iconStyle(hovered.reddit, theme)}
             onMouseEnter={() => handleHovered('reddit', true)}
             onMouseLeave={() => handleHovered('reddit', false)}
           >
@@ -107,51 +99,42 @@ export const CryptoFull = ({
           }}
         >
           <Details
+            x={x}
+            canDrop={canDrop}
             state={state}
             handleHovered={handleHovered}
             hovered={hovered}
-            x={x}
             currencyName={state.data.id}
           />
         </div>
-        <div
-          className='crypto-description'
-          style={{
-            placeSelf: 'start',
-            fontSize: '0.6em',
-            gridColumn: '1 / 2',
-            gridRow: '2 / 3',
-          }}
-        >
-          {state.data.public_notice !== null ? (
-            <div>
-              <h4>Public notice:</h4>
-              <p style={{ marginTop: 5 }}>{state.data.public_notice}</p>
-            </div>
-          ) : (
-            state.data.description.en !== null && (
+        {!canDrop && (
+          <div
+            className='crypto-description'
+            style={{
+              placeSelf: 'start',
+              fontSize: '0.6em',
+              gridColumn: '1 / 2',
+              gridRow: '2 / 3',
+            }}
+          >
+            {state.data.public_notice !== null ? (
               <div>
-                <h4>Description:</h4>
-                <p style={{ marginTop: 5 }}>
-                  {state.data.description.en.match(/[\w\s;-]*\./)[0]}
-                </p>
+                <h4>Public notice:</h4>
+                <p style={{ marginTop: 5 }}>{state.data.public_notice}</p>
               </div>
-            )
-          )}
-        </div>
+            ) : (
+              state.data.description.en !== null && (
+                <div>
+                  <h4>Description:</h4>
+                  <p style={{ marginTop: 5 }}>
+                    {state.data.description.en.match(/[\w\s;-]*\./)[0]}
+                  </p>
+                </div>
+              )
+            )}
+          </div>
+        )}
       </>
     )}
   </div>
 );
-
-const iconStyle = (hovered, theme) =>
-  hovered
-    ? {
-        backgroundColor:
-          theme.name === 'normal'
-            ? 'rgba(43, 43, 43, 0.6)'
-            : 'rgba(237, 237, 237, 0.6)',
-        padding: 5,
-        borderRadius: '50%',
-      }
-    : { padding: 5 };

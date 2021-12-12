@@ -12,9 +12,7 @@ import { useFetch } from '../Hooks/useFetch';
 
 function Weather() {
   const [coords, setCoords] = useState();
-  const {
-    theme,
-  } = useContext(Context);
+  const { theme } = useContext(Context);
 
   const { id, x, y, isDragging, canDrop, flexStyleX, flexStyleY, windowSmall } =
     useContext(ItemContext);
@@ -29,16 +27,17 @@ function Weather() {
   }, []);
 
   useEffect(() => {
-    cityName && fetch(
-      `https://apis.scrimba.com/openweathermap/data/2.5/weather?q=${cityName}`
-    )
-      .then((a) => a.ok && a.json())
-      .then(
-        (a) =>
-          a.cod !== '404' &&
-          localStorage.setItem('weatherLocationName', cityName)
+    cityName &&
+      fetch(
+        `https://apis.scrimba.com/openweathermap/data/2.5/weather?q=${cityName}`
       )
-      .catch(() => console.log('Failed to fetch weather.'));
+        .then((a) => a.ok && a.json())
+        .then(
+          (a) =>
+            a.cod !== '404' &&
+            localStorage.setItem('weatherLocationName', cityName)
+        )
+        .catch(() => console.log('Failed to fetch weather.'));
   }, [cityName]);
 
   const { ErrorMessage, setErrorText, errorDisplay } = useErrorMessage(state);
@@ -136,7 +135,7 @@ function Weather() {
         wind: state.data.wind.speed.toFixed() + windText,
       });
   }, [state, units]);
-  
+
   const [dataAvailable, setDataAvailable] = useState(false);
   useEffect(
     () =>
@@ -177,7 +176,6 @@ function Weather() {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        placeSelf: (canDrop || x === 'center') && 'center',
         justifyContent: flexStyleY,
         alignItems: flexStyleX,
         transform: windowSmall && 'scale(1.4)',
@@ -222,17 +220,7 @@ function Weather() {
           />
         )}
       </div>
-      {((state.error && errorDisplay) || !dataAvailable) && (
-        <ErrorMessage
-          x={x}
-          theme={theme}
-          style={{
-            display: 'border-box',
-            marginTop: !state.data || errorDisplay ? 10 : '',
-            justifySelf: flexStyleX,
-          }}
-        />
-      )}
+      {((state.error && errorDisplay) || !dataAvailable) && <ErrorMessage />}
     </div>
   );
 }

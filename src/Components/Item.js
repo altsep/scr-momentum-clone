@@ -197,8 +197,8 @@ function Item(props) {
         }
   );
 
-  const flexStyleX = x === 'left' ? 'start' : x === 'center' ? 'center' : 'end';
-  const flexStyleY = y === 'top' ? 'start' : x === 'center' ? 'center' : 'end';
+  const flexStyleX = canDrop ? 'center' : x === 'left' ? 'start' : x === 'center' ? 'center' : 'end';
+  const flexStyleY = canDrop ? 'center' : y === 'top' ? 'start' : x === 'center' ? 'center' : 'end';
 
   // Handle controls for "hide all"
   useEffect(() => {

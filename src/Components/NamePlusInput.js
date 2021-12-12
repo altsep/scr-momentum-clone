@@ -26,7 +26,7 @@ const NamePlusInput = ({ state, setQuery, theme, char }) => {
 
   const handleNameDisplay = () => {
     if (titleRef.current !== null)
-      if (id === 'crypto' && x === 'center') {
+      if (id === 'crypto' && x === 'center' && state.data) {
         setTitleDisplay('block');
       } else setTitleDisplay('none');
     if (inputRef.current !== null) {
@@ -93,13 +93,23 @@ const NamePlusInput = ({ state, setQuery, theme, char }) => {
       <p
         className='name'
         ref={titleRef}
-        style={{
-          display: titleDisplay,
-          opacity: !state.data && 0.8,
-          fontStyle: !state.data && 'italic',
-          fontSize: !state.data && '80%',
-          cursor: 'pointer',
-        }}
+        style={Object.assign(
+          {
+            display: titleDisplay,
+            opacity: !state.data && 0.8,
+            fontStyle: !state.data && 'italic',
+            fontSize: !state.data && '80%',
+            cursor: 'pointer',
+          },
+          id === 'crypto' &&
+            x === 'center' &&
+            !state.data && {
+              position: 'absolute',
+              top: inputPos ? inputPos - 45 : undefined,
+              left: '50%',
+              transform: 'translateX(-50%)',
+            }
+        )}
         onClick={handleNameDisplay}
       >
         {state.data

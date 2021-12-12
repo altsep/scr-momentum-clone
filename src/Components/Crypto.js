@@ -64,9 +64,11 @@ function Crypto() {
   return (
     <div
       style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: flexStyleY,
+        alignItems: flexStyleX,
         transform: windowSmall && 'scale(1.4)',
-        display: 'grid',
-        justifyContent: flexStyleX,
       }}
       onMouseEnter={() => handleHovered('details', true)}
       onMouseLeave={() => handleHovered('details', false)}
@@ -75,7 +77,6 @@ function Crypto() {
         loaderText
       ) : x === 'center' ? (
         <CryptoFull
-          id={id}
           x={x}
           canDrop={canDrop}
           state={state}
@@ -87,8 +88,8 @@ function Crypto() {
         />
       ) : (
         <CryptoSmall
-          id={id}
           x={x}
+          canDrop={canDrop}
           flexStyleX={flexStyleX}
           flexStyleY={flexStyleY}
           windowSmall={windowSmall}
@@ -100,13 +101,7 @@ function Crypto() {
           setCryptoName={setCryptoName}
         />
       )}
-      {state.error && errorDisplay && (
-        <ErrorMessage
-          x={x}
-          theme={theme}
-          style={{ marginTop: state.data ? 10 : '', justifySelf: flexStyleX }}
-        />
-      )}
+      {state.error && errorDisplay && <ErrorMessage />}
     </div>
   );
 }

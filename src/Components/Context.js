@@ -75,10 +75,6 @@ const Provider = (props) => {
   }, [pseudoLoadingTimeout]);
 
   // Theming to accomodate initial loader and possible failure to either fetch location or load image. Used instead of a backup image
-  const [theme, setTheme] = useState({});
-
-  const error = state.error;
-  const url = state.data && state.data.urls.regular;
   const themes = {
     normal: {
       name: 'normal',
@@ -89,16 +85,22 @@ const Provider = (props) => {
     awkward: {
       name: 'awkward',
       color: '#2b2b2b',
-      textShadow: '2px 2px 2px #ededed',
       border: 'solid 2px #2b2b2b4d',
     },
   };
 
+  const [theme, setTheme] = useState(themes.normal);
+
+  const error = state.error;
+  const url = state.data && state.data.urls.regular;
   useEffect(() => {
-    awkwardLoading && (state.loadingImage || error)
-      ? setTheme(themes.awkward)
-      : !error && url && setTheme(themes.normal);
-  }, [awkwardLoading, state.loadingImage, state.data, error]);
+    // Dark text during load
+    // awkwardLoading && (state.loadingImage || error)
+    //   ? setTheme(themes.awkward)
+    awkwardLoading || (!error && url)
+      ? setTheme(themes.normal)
+      : setTheme(themes.awkward);
+  }, [awkwardLoading, error, url]);
 
   // State for info element that is used in main component
   const [infoStatus, setInfoStatus] = useState('initial');

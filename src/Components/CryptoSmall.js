@@ -4,6 +4,7 @@ import { Details } from './CryptoDetails';
 
 export const CryptoSmall = ({
   x,
+  canDrop,
   flexStyleX,
   flexStyleY,
   windowSmall,
@@ -41,6 +42,7 @@ export const CryptoSmall = ({
           style={{
             color: theme.color,
             display: 'grid',
+            marginRight: 5,
           }}
           onMouseEnter={() => handleHovered('logo', true)}
           onMouseLeave={() => handleHovered('logo', false)}
@@ -54,7 +56,6 @@ export const CryptoSmall = ({
           />
         </a>
       )}
-      &nbsp;
       <NamePlusInput
         state={state}
         setQuery={setCryptoName}
@@ -62,23 +63,24 @@ export const CryptoSmall = ({
         char='c'
       />
     </div>
-    <div
-      className='crypto-details-container'
-      style={{
-        marginTop: 10,
-        lineHeight: 1.5,
-      }}
-    >
-      {state.data && (
+    {state.data && (
+      <div
+        className='crypto-details-container'
+        style={{
+          marginTop: 10,
+          lineHeight: 1.5,
+        }}
+      >
         <Details
           state={state}
           handleHovered={handleHovered}
           hovered={hovered}
           x={x}
+          canDrop={canDrop}
           currencyName={state.data.id}
           windowSmall={windowSmall}
         />
-      )}
-    </div>
+      </div>
+    )}
   </div>
 );

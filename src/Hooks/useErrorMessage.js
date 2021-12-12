@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { Context } from '../Components/Context';
+import { ItemContext } from '../Components/Item';
 
 export const useErrorMessage = (state) => {
   const [errorText, setErrorText] = useState('An error occured.');
@@ -59,16 +61,19 @@ export const useErrorMessage = (state) => {
   }, []);
 
   const ErrorMessage = (props) => {
+    const { theme } = useContext(Context);
+    const { y, flexStyleX } = useContext(ItemContext);
     return (
       <div
-        style={Object.assign(
-          {
-            fontStyle: 'italic',
-            fontSize: props.size || '0.7rem',
-            color: props.theme.color + 'e0' || '',
-          },
-          props.style
-        )}
+        style={{
+          fontStyle: 'italic',
+          fontSize: props.size || '0.7rem',
+          color: theme.color + 'e0' || '',
+          order: y === 'bottom' && -2,
+          marginTop: y !== 'bottom' && 10,
+          marginBottom: y === 'bottom' && 10,
+          justifySelf: flexStyleX,
+        }}
       >
         {'// ' +
           (props.text || errorText.replace(/\w/, (a) => a.toUpperCase()))}
