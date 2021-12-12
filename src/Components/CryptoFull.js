@@ -35,9 +35,6 @@ export const CryptoFull = ({
     >
       {state.data && (
         <a
-          // style={{
-          //   alignSelf: 'start',
-          // }}
           href={state.data.links && state.data.links.homepage[0]}
           target='_blank'
           rel='noreferrer'
