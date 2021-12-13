@@ -82,7 +82,7 @@ function Location() {
               style={{ marginLeft: 10 }}
               onClick={handleUnsplashRestore}
             >
-              'Restore'
+              Restore
             </p>
           )}
         </div>
