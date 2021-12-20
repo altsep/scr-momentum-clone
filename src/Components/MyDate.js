@@ -75,6 +75,7 @@ function MyDate(props) {
         transform: windowSmall && 'scale(1.2)',
         width: windowDimensions.height < 720 && '3em',
         margin: windowSmall && 0,
+        cursor: 'pointer',
       }}
       onClick={handleClick}
       onMouseDown={() => setActive(true)}
