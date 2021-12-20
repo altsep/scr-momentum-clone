@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useFetch } from '../Hooks/useFetch';
 
-const Provider = (props) => {
+const Provider = props => {
   // fetch unsplash
   const [unsplashName, setUnsplashName] = useState('');
   const [unsplashUrl, setUnsplashUrl] = useState('');
@@ -17,7 +17,7 @@ const Provider = (props) => {
     const saved = JSON.parse(localStorage.getItem('imageSaved'));
     const keyword = localStorage.getItem('imageThemeName');
     if (saved) {
-      setState((s) => ({ ...s, data: saved }));
+      setState(s => ({ ...s, data: saved }));
       setIsSaved(true);
     } else if (keyword) setUnsplashUrl(unsplashUrlTemp + `&query=${keyword}`);
     else {
@@ -45,22 +45,22 @@ const Provider = (props) => {
 
   const handleUnsplashRestore = () => {
     const item = JSON.parse(localStorage.getItem('imageSaved'));
-    item && setState((s) => ({ ...s, data: item }));
+    item && setState(s => ({ ...s, data: item }));
   };
 
   useEffect(() => {
     if (unsplashName) {
       fetch(unsplashUrlTemp + `&query=${unsplashName}`)
-        .then((a) => a.json())
-        .then((b) => {
+        .then(a => a.json())
+        .then(b => {
           if (b.errors) throw Error(b.errors);
           else {
             setUnsplashUrl(unsplashUrlTemp + `&query=${unsplashName}`);
             localStorage.setItem('imageThemeName', unsplashName);
           }
         })
-        .catch((err) =>
-          setState((s) => ({ ...s, error: true, errorDetails: err.message }))
+        .catch(err =>
+          setState(s => ({ ...s, error: true, errorDetails: err.message }))
         );
     }
   }, [setState, unsplashName]);

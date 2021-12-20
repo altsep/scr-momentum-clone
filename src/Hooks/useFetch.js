@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export const useFetch = (url) => {
+export const useFetch = url => {
   const [state, setState] = useState({
     data: null,
     loading: true,
@@ -11,7 +11,7 @@ export const useFetch = (url) => {
   });
 
   const handleBool = (key, val, reload) => {
-    setState((state) => {
+    setState(state => {
       let result = { ...state };
       if (reload) result[key] = !result[key];
       else result[key] = val;
@@ -20,7 +20,7 @@ export const useFetch = (url) => {
   };
 
   useEffect(() => {
-    setState((state) => ({
+    setState(state => ({
       ...state,
       data: state.data,
       loading: true,
@@ -28,18 +28,18 @@ export const useFetch = (url) => {
       error: false,
     }));
     fetch(url, { headers: { mode: 'no-cors' } })
-      .then((x) => {
+      .then(x => {
         // console.log(x);
         if (x.ok) {
           return x.text();
         } else throw Error(x.status);
       })
-      .then((y) => {
+      .then(y => {
         // console.log(y);
         y = y.match(/{.*}/);
         return JSON.parse(y);
       })
-      .then((z) => {
+      .then(z => {
         // console.log(z);
         if (z !== null && z.hasOwnProperty('errors')) {
           // console.log(state.data.errors)
@@ -54,23 +54,23 @@ export const useFetch = (url) => {
           console.log('Duplicate url found, repeating request.');
           handleBool('active', null, true);
         } else if (z)
-          setState((state) => ({
+          setState(state => ({
             ...state,
             data: z,
             loading: false,
             // loadingImage: false,
           }));
         else
-          setState((state) => ({
+          setState(state => ({
             ...state,
             data: state.data,
             loading: false,
             // loadingImage: false,
           }));
       })
-      .catch((err) => {
+      .catch(err => {
         // console.log(err);
-        setState((state) => ({
+        setState(state => ({
           ...state,
           loading: false,
           loadingImage: false,

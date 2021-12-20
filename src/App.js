@@ -18,16 +18,21 @@ function App() {
     { id: 'info', el: <Info /> },
   ]);
 
-  const { state: unsplash, theme, awkwardLoading, infoStatus } = useContext(Context);
+  const {
+    state: unsplash,
+    theme,
+    awkwardLoading,
+    infoStatus,
+  } = useContext(Context);
 
   const windowDimensions = useWindowDimensions();
 
   useEffect(() => {
     const items = JSON.parse(localStorage.getItem('items'));
     if (items) {
-      setItemList((state) => {
+      setItemList(state => {
         let result = [];
-        items.forEach((a) => result.push(state.find((b) => b.id === a)));
+        items.forEach(a => result.push(state.find(b => b.id === a)));
         return result;
       });
     }
@@ -46,14 +51,15 @@ function App() {
             id={el.id}
             key={el.id}
             responsiveIndex={itemList
-              .filter((a) => a.id !== 'location' && a.id !== 'info' && a.id)
-              .map((a) => a.id)
-              .findIndex((a) => a === el.id)}
+              .filter(a => a.id !== 'location' && a.id !== 'info' && a.id)
+              .map(a => a.id)
+              .findIndex(a => a === el.id)}
             setList={setItemList}
             x={pos.x}
             y={pos.y}
             infoExpanded={infoStatus === 'expanded'}
             windowDimensions={windowDimensions}
+            children={el.el}
           />
         );
       })}
@@ -85,7 +91,7 @@ const mainStyle = (theme, awkwardLoading, unsplash, window) =>
     }
   );
 
-const getPosition = (i) => {
+const getPosition = i => {
   switch (i) {
     case 0:
       return { x: 'left', y: 'top' };

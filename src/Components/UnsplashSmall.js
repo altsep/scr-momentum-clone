@@ -1,18 +1,7 @@
 import NamePlusInput from './NamePlusInput';
 
-export const LocationSmall = ({
-  state,
-  theme,
-  setQuery,
-  char,
-  flexStyleX,
-}) => (
-  <div style={{ placeSelf: flexStyleX }}>
-    <NamePlusInput
-      state={state}
-      setQuery={setQuery}
-      theme={theme}
-      char={char}
-    />
+export const LocationSmall = props => (
+  <div style={{ placeSelf: props.flexStyleX }}>
+    <NamePlusInput {...props} />
   </div>
 );

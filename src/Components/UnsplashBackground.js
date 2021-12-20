@@ -61,7 +61,7 @@ function Background() {
   };
 
   useEffect(() => {
-    const onKeyUp = (e) => {
+    const onKeyUp = e => {
       if (e.key.toLowerCase() === 'b' && !doublePressRef.current) {
         doublePressRef.current = true;
         setTimeout(() => (doublePressRef.current = false), 300);
@@ -137,7 +137,7 @@ function Background() {
         onLoad={() => {
           handleBool('loadingImage', false);
         }}
-        onError={(e) => {
+        onError={e => {
           handleBool('loadingImage', false);
           handleBool('error', true);
           handleBool('errorDetails', "Couldn't load image");
@@ -158,7 +158,7 @@ function Background() {
             textShadow: 'none',
             fontSize: '5rem',
             userSelect: 'none',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
           }}
         >
           （゜;﹏;゜）

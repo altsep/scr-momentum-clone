@@ -1,6 +1,6 @@
 import NamePlusInput from './NamePlusInput';
 
-export const WeatherFull = ({ props }) => {
+export const WeatherFull = props => {
   const {
     state,
     temp,
@@ -9,9 +9,7 @@ export const WeatherFull = ({ props }) => {
     flexStyleX,
     flexStyleY,
     iconWithProps,
-    setQuery,
     theme,
-    char,
     handleClick,
   } = props;
   return (
@@ -69,12 +67,7 @@ export const WeatherFull = ({ props }) => {
             borderTop: state.data && theme.border,
           }}
         >
-          <NamePlusInput
-            state={state}
-            setQuery={setQuery}
-            theme={theme}
-            char={char}
-          />
+          <NamePlusInput {...props} />
           {iconWithProps}
         </div>
       </div>

@@ -53,7 +53,7 @@ export const InfoSmall = ({
           cursor: 'pointer',
         }}
         onClick={() => {
-          setInfoStatus((state) =>
+          setInfoStatus(state =>
             state === 'initial' ? 'expanded' : 'initial'
           );
         }}

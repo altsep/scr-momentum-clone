@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLoaderText } from '../Hooks/useLoaderText';
-import { Context } from './Context';
-import { ItemContext } from './Item';
 import { useErrorMessage } from '../Hooks/useErrorMessage';
 import ControlsSwitch from '../Misc/ControlsSwitch';
 import { IconSwitch } from '../Misc/Icons';
@@ -10,12 +8,20 @@ import { WeatherSmall } from './WeatherSmall';
 import { IconWeather as Icon } from '../Misc/Icons';
 import { useFetch } from '../Hooks/useFetch';
 
-function Weather() {
+function Weather(props) {
   const [coords, setCoords] = useState();
-  const { theme } = useContext(Context);
-
-  const { id, x, y, isDragging, canDrop, flexStyleX, flexStyleY, windowSmall } =
-    useContext(ItemContext);
+  const {
+    theme,
+    id,
+    x,
+    y,
+    isDragging,
+    canDrop,
+    flexStyleX,
+    flexStyleY,
+    windowSmall,
+    setHasActiveInput,
+  } = props;
 
   const [cityName, setCityName] = useState('');
   const [url, setUrl] = useState('');
@@ -31,9 +37,9 @@ function Weather() {
       fetch(
         `https://apis.scrimba.com/openweathermap/data/2.5/weather?q=${cityName}`
       )
-        .then((a) => a.ok && a.json())
+        .then(a => a.ok && a.json())
         .then(
-          (a) =>
+          a =>
             a.cod !== '404' &&
             localStorage.setItem('weatherLocationName', cityName)
         )
@@ -57,14 +63,15 @@ function Weather() {
       maximumAge: 0,
     };
 
-    const error = (err) => {
+    const error = err => {
       console.log(`ERROR(${err.code}): ${err.message}`);
+      // Trigger error in state
       // handleBool('error', true);
       setErrorText('Geolocation failed');
     };
 
     const locationWatchId = navigator.geolocation.getCurrentPosition(
-      (pos) => setCoords(pos.coords),
+      pos => setCoords(pos.coords),
       error,
       options
     );
@@ -105,10 +112,10 @@ function Weather() {
 
   const handleClick = () =>
     !state.error &&
-    setUnits((state) => (state === 'imperial' ? 'metric' : 'imperial'));
+    setUnits(state => (state === 'imperial' ? 'metric' : 'imperial'));
 
   useEffect(() => {
-    const onKeyDown = (e) => {
+    const onKeyDown = e => {
       e.shiftKey && e.key.toLowerCase() === 'u' && handleClick();
     };
     document.addEventListener('keydown', onKeyDown);
@@ -152,7 +159,7 @@ function Weather() {
     />
   );
 
-  const propsMain = {
+  const childProps = {
     id,
     x,
     state,
@@ -168,6 +175,7 @@ function Weather() {
     char: 'w',
     handleClick: handleClick,
     windowSmall,
+    setHasActiveInput,
   };
 
   return (
@@ -199,9 +207,9 @@ function Weather() {
         {state.loading ? (
           loaderText
         ) : x === 'center' ? (
-          <WeatherFull props={propsMain} />
+          <WeatherFull {...childProps} />
         ) : (
-          <WeatherSmall props={propsMain} />
+          <WeatherSmall {...childProps} />
         )}
         {!isDragging && !canDrop && !windowSmall && state.data && (
           <ControlsSwitch
@@ -220,7 +228,9 @@ function Weather() {
           />
         )}
       </div>
-      {((state.error && errorDisplay) || !dataAvailable) && <ErrorMessage />}
+      {((state.error && errorDisplay) || !dataAvailable) && (
+        <ErrorMessage theme={theme} />
+      )}
     </div>
   );
 }

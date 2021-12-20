@@ -1,15 +1,13 @@
 import React, { useContext } from 'react';
 import { useLoaderText } from '../Hooks/useLoaderText';
 import { Context } from './Context';
-import { ItemContext } from './Item';
 import { useErrorMessage } from '../Hooks/useErrorMessage';
 import { LocationFull } from './UnsplashFull';
 import { LocationSmall } from './UnsplashSmall';
 
-function Location() {
+function Location(props) {
   const {
     awkwardLoading,
-    theme,
     state,
     setUnsplashName,
     handleUnsplashSaved,
@@ -18,9 +16,17 @@ function Location() {
     savedText: isSaved,
     savedCue: savedCueDisplay,
   } = useContext(Context);
-  const { id, x, y, canDrop, flexStyleX } = useContext(ItemContext);
+  const { theme, x, y, canDrop, flexStyleX } = props;
   const loaderText = useLoaderText(state.loadingImage, x === 'center' && '1em');
   const { ErrorMessage, errorDisplay } = useErrorMessage(state);
+  const childProps = {
+    ...props,
+    theme,
+    state,
+    setQuery: setUnsplashName,
+    handleSaved: handleUnsplashSaved,
+    char: 'l',
+  };
   return (
     <div
       className='location'
@@ -36,25 +42,9 @@ function Location() {
         ? loaderText
         : !awkwardLoading &&
           (x === 'center' ? (
-            <LocationFull
-              id={id}
-              x={x}
-              state={state}
-              setQuery={setUnsplashName}
-              theme={theme}
-              char='l'
-            />
+            <LocationFull {...childProps} />
           ) : (
-            <LocationSmall
-              id={id}
-              x={x}
-              state={state}
-              setQuery={setUnsplashName}
-              theme={theme}
-              char='l'
-              flexStyleX={flexStyleX}
-              handleSaved={handleUnsplashSaved}
-            />
+            <LocationSmall {...childProps} />
           ))}
       {state.data && !state.loadingImage && (
         <div
@@ -88,9 +78,9 @@ function Location() {
         </div>
       )}
       {!state.data && errorDisplay ? (
-        <ErrorMessage text="Couldn't load image data" />
+        <ErrorMessage text="Couldn't load image data" theme={theme} />
       ) : (
-        state.error && errorDisplay && <ErrorMessage />
+        state.error && errorDisplay && <ErrorMessage theme={theme} />
       )}
     </div>
   );

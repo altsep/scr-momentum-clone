@@ -1,14 +1,13 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Context } from './Context';
-import { ItemContext } from './Item';
 import { InfoSmall } from './InfoSmall';
 import { InfoExtended } from './InfoExtended';
 
-function Info() {
-  const { theme, themes, infoStatus, setInfoStatus } = useContext(Context);
+function Info(props) {
+  const context = useContext(Context);
+  const { infoStatus, setInfoStatus } = context;
 
-  const { x, y, flexStyleX, canDrop, isDragging, windowDimensions } =
-    useContext(ItemContext);
+  const { x, canDrop } = props;
 
   useEffect(
     () => x === 'center' && setInfoStatus('initial'),
@@ -18,6 +17,13 @@ function Info() {
   const [smallHovered, setSmallHovered] = useState(false);
 
   const { awkwardLoading } = useContext(Context);
+
+  const childProps = {
+    ...props,
+    ...context,
+    hovered: smallHovered,
+    setHovered: setSmallHovered,
+  };
 
   return (
     <div
@@ -37,31 +43,9 @@ function Info() {
         }
       )}
     >
-      {x !== 'center' && (
-        <InfoSmall
-          x={x}
-          y={y}
-          flexStyleX={flexStyleX}
-          theme={theme}
-          themes={themes}
-          hovered={smallHovered}
-          setHovered={setSmallHovered}
-          infoStatus={infoStatus}
-          setInfoStatus={setInfoStatus}
-        />
-      )}
+      {x !== 'center' && <InfoSmall {...childProps} />}
       {(infoStatus === 'expanded' || x === 'center') && (
-        <InfoExtended
-          x={x}
-          theme={theme}
-          themes={themes}
-          hovered={smallHovered}
-          isDragging={isDragging}
-          canDrop={canDrop}
-          windowDimensions={windowDimensions}
-          infoStatus={infoStatus}
-          awkwardLoading={awkwardLoading}
-        />
+        <InfoExtended {...childProps} />
       )}
     </div>
   );

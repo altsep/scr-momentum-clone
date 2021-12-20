@@ -10,10 +10,12 @@ function Item(props) {
   const { x, y, id, el, infoExpanded, windowDimensions, responsiveIndex } =
     props;
 
+  const El = el.type;
+
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.item,
     item: { id: props.id },
-    collect: (monitor) => {
+    collect: monitor => {
       return {
         isDragging: monitor.isDragging(),
         getDragItem: monitor.getItem(),
@@ -23,13 +25,13 @@ function Item(props) {
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ItemTypes.item,
-    canDrop: (item) => props.id !== item.id,
+    canDrop: item => props.id !== item.id,
     // hover: (item, monitor) => ,
     drop: (item, monitor) =>
       monitor.isOver() &&
-      props.setList((state) => {
-        let sourceIndex = state.findIndex((el) => el.id === item.id);
-        let targetIndex = state.findIndex((el) => el.id === props.id);
+      props.setList(state => {
+        let sourceIndex = state.findIndex(el => el.id === item.id);
+        let targetIndex = state.findIndex(el => el.id === props.id);
         let result = state.slice();
         const swapItems = (index1, index2, arr) => {
           let temp = arr[index1];
@@ -37,11 +39,11 @@ function Item(props) {
           arr[index2] = temp;
         };
         swapItems(sourceIndex, targetIndex, result);
-        const storedResult = JSON.stringify(result.map((a) => a.id));
+        const storedResult = JSON.stringify(result.map(a => a.id));
         localStorage.setItem('items', storedResult);
         return result;
       }),
-    collect: (monitor) => ({
+    collect: monitor => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
       dropResult: monitor.getDropResult(),
@@ -197,64 +199,72 @@ function Item(props) {
         }
   );
 
-  const flexStyleX = canDrop ? 'center' : x === 'left' ? 'start' : x === 'center' ? 'center' : 'end';
-  const flexStyleY = canDrop ? 'center' : y === 'top' ? 'start' : x === 'center' ? 'center' : 'end';
+  const flexStyleX = canDrop
+    ? 'center'
+    : x === 'left'
+    ? 'start'
+    : x === 'center'
+    ? 'center'
+    : 'end';
+  const flexStyleY = canDrop
+    ? 'center'
+    : y === 'top'
+    ? 'start'
+    : x === 'center'
+    ? 'center'
+    : 'end';
 
   // Handle controls for "hide all"
   useEffect(() => {
-    const onKeyDown = (e) =>
+    const onKeyDown = e =>
       e.shiftKey &&
       e.key.toLowerCase() === 'h' &&
-      setItemsHidden((state) => !state);
+      setItemsHidden(state => !state);
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
   }, []);
 
+  const childProps = {
+    theme,
+    x: windowSmall ? 'initial' : x,
+    y: windowSmall ? 'initial' : y,
+    id,
+    isDragging,
+    canDrop,
+    flexStyleX: windowSmall ? 'center' : flexStyleX,
+    flexStyleY: windowSmall ? 'center' : flexStyleY,
+    windowSmall,
+    windowDimensions,
+    setHasActiveInput,
+  };
+
   return (
-    <ItemProvider
-      value={{
-        x: windowSmall ? 'initial' : x,
-        y: windowSmall ? 'initial' : y,
-        id,
-        isDragging,
-        canDrop,
-        flexStyleX: windowSmall ? 'center' : flexStyleX,
-        flexStyleY: windowSmall ? 'center' : flexStyleY,
-        windowSmall,
-        windowDimensions: props.windowDimensions,
-        setHasActiveInput,
-      }}
+    <div
+      className={`item ${id} ${x}`}
+      ref={dragDropRef}
+      style={
+        windowSmall
+          ? itemStyleMedia
+          : x === 'center'
+          ? itemStyleCenter
+          : itemStyle
+      }
     >
-      <div
-        className={`item ${id} ${x}`}
-        ref={dragDropRef}
-        style={
-          windowSmall
-            ? itemStyleMedia
-            : x === 'center'
-            ? itemStyleCenter
-            : itemStyle
-        }
-      >
-        {el}
-        {canDrop && (
-          <div
-            style={{
-              fontSize: '0.5em',
-              textTransform: 'uppercase',
-              justifySelf: 'center',
-              alignSelf: 'end',
-            }}
-          >
-            {'> drop here to swap items <'}
-          </div>
-        )}
-      </div>
-    </ItemProvider>
+      <El {...childProps} />
+      {canDrop && (
+        <div
+          style={{
+            fontSize: '0.5em',
+            textTransform: 'uppercase',
+            justifySelf: 'center',
+            alignSelf: 'end',
+          }}
+        >
+          {'> drop here to swap items <'}
+        </div>
+      )}
+    </div>
   );
 }
-
-export const ItemContext = React.createContext(null);
-const ItemProvider = ItemContext.Provider;
 
 export default Item;

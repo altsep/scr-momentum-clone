@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import { ItemContext } from './Item';
+import React, { useState, useEffect, useRef } from 'react';
 
-const NamePlusInput = ({ state, setQuery, theme, char }) => {
+const NamePlusInput = props => {
+  const { state, setQuery, theme, char, id, x, setHasActiveInput } = props;
   const [titleName, setTitleName] = useState('');
   const [titleValue, setTitleValue] = useState(titleName || '');
-  const { id, x, setHasActiveInput } = useContext(ItemContext);
 
   useEffect(
     () =>
@@ -36,7 +35,7 @@ const NamePlusInput = ({ state, setQuery, theme, char }) => {
   };
 
   useEffect(() => {
-    const onKeyDown = (e) => {
+    const onKeyDown = e => {
       if (e.shiftKey && e.key.toLowerCase() === char) {
         const el = document.getElementsByClassName('name-hidden-input');
         let displayArr = [];
@@ -44,14 +43,14 @@ const NamePlusInput = ({ state, setQuery, theme, char }) => {
           const display = el[i].style.display;
           displayArr.push(display);
         }
-        if (displayArr.every((a) => a === 'none')) return handleNameDisplay();
+        if (displayArr.every(a => a === 'none')) return handleNameDisplay();
       }
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [char, handleNameDisplay]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     setQuery(
       titleValue
         .toLowerCase()
@@ -152,8 +151,8 @@ const NamePlusInput = ({ state, setQuery, theme, char }) => {
           name='name'
           value={titleValue}
           placeholder='Input request...'
-          onChange={(e) => setTitleValue(e.target.value)}
-          onKeyDown={(e) => {
+          onChange={e => setTitleValue(e.target.value)}
+          onKeyDown={e => {
             e.key === 'Enter'
               ? handleSubmit(e)
               : e.key === 'Escape' && inputRef.current.blur();
@@ -162,7 +161,7 @@ const NamePlusInput = ({ state, setQuery, theme, char }) => {
             setTitleValue('');
             setHasActiveInput(true);
           }}
-          onBlur={(e) => {
+          onBlur={e => {
             // e.target.style.display = 'none';
             // titleRef.current.style.display = 'block';
             setInputDisplay('none');

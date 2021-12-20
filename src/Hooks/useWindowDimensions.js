@@ -28,4 +28,4 @@ export const useWindowDimensions = () => {
   }, [hasWindow]);
 
   return windowDimensions;
-}
+};

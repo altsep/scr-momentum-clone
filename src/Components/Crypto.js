@@ -1,17 +1,12 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLoaderText } from '../Hooks/useLoaderText';
-import { Context } from './Context';
 import { useErrorMessage } from '../Hooks/useErrorMessage';
-import { ItemContext } from './Item';
 import { CryptoFull } from './CryptoFull';
 import { CryptoSmall } from './CryptoSmall';
 import { useFetch } from '../Hooks/useFetch';
 
-function Crypto() {
-  const { theme } = useContext(Context);
-
-  const { id, x, canDrop, flexStyleX, flexStyleY, windowSmall } =
-    useContext(ItemContext);
+function Crypto(props) {
+  const { theme, x, flexStyleX, flexStyleY, windowSmall } = props;
 
   const [cryptoName, setCryptoName] = useState('');
   const cryptoUrl = `https://api.coingecko.com/api/v3/coins/${cryptoName}?localization=false&market_data=true`;
@@ -27,7 +22,7 @@ function Crypto() {
     const item = localStorage.getItem('cryptoCurrencyName');
     if (cryptoName) {
       fetch(cryptoUrl)
-        .then((a) => {
+        .then(a => {
           if (a.ok) {
             localStorage.setItem('cryptoCurrencyName', cryptoName);
             setCryptoFetchUrl(cryptoUrl);
@@ -36,8 +31,8 @@ function Crypto() {
             throw Error(a.status);
           }
         })
-        .catch((err) => {
-          setState((s) => ({ ...s, error: true, errorDetails: err.message }));
+        .catch(err => {
+          setState(s => ({ ...s, error: true, errorDetails: err.message }));
         });
     }
   }, [cryptoName, cryptoUrl, setState]);
@@ -52,7 +47,7 @@ function Crypto() {
   });
 
   const handleHovered = (key, bool) => {
-    setHovered((state) => {
+    setHovered(state => {
       let result = { ...state };
       result[key] = bool;
       return result;
@@ -60,6 +55,17 @@ function Crypto() {
   };
 
   const { ErrorMessage, errorDisplay } = useErrorMessage(state);
+
+  const childProps = {
+    ...props,
+    theme,
+    state,
+    handleBool,
+    handleHovered,
+    hovered,
+    setQuery: setCryptoName,
+    char: 'c',
+  };
 
   return (
     <div
@@ -76,32 +82,11 @@ function Crypto() {
       {state.loading ? (
         loaderText
       ) : x === 'center' ? (
-        <CryptoFull
-          x={x}
-          canDrop={canDrop}
-          state={state}
-          theme={theme}
-          handleBool={handleBool}
-          handleHovered={handleHovered}
-          hovered={hovered}
-          setCryptoName={setCryptoName}
-        />
+        <CryptoFull {...childProps} />
       ) : (
-        <CryptoSmall
-          x={x}
-          canDrop={canDrop}
-          flexStyleX={flexStyleX}
-          flexStyleY={flexStyleY}
-          windowSmall={windowSmall}
-          state={state}
-          theme={theme}
-          handleBool={handleBool}
-          handleHovered={handleHovered}
-          hovered={hovered}
-          setCryptoName={setCryptoName}
-        />
+        <CryptoSmall {...childProps} />
       )}
-      {state.error && errorDisplay && <ErrorMessage />}
+      {state.error && errorDisplay && <ErrorMessage theme={theme} />}
     </div>
   );
 }

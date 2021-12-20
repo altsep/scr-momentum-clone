@@ -10,26 +10,23 @@ export const InfoExtended = ({
   canDrop,
   windowDimensions,
   infoStatus,
-  awkwardLoading,
 }) => {
   const bgColor =
     theme.name === 'awkward' ? theme.color + '20' : themes.awkward.color + '9f';
-
+  const padding = 50;
   const [scroll, setScroll] = useState(false);
 
   useEffect(() => {
     const el = document.querySelector('.controls-list');
-    if (!awkwardLoading && el) {
-      setTimeout(() => setScroll(el.scrollHeight > el.clientHeight), 1);
-      window.addEventListener('resize', () => {
-        setScroll(el.scrollHeight > el.clientHeight);
-      });
-    }
+    setScroll(el.scrollHeight - padding > el.clientHeight);
+    window.addEventListener('resize', () => {
+      setScroll(el.scrollHeight - padding > el.clientHeight);
+    });
     return () =>
-      window.removeEventListener('resize', () =>
-        setScroll(el.scrollHeight > el.clientHeight)
-      );
-  }, [awkwardLoading]);
+      window.removeEventListener('resize', () => {
+        setScroll(el.scrollHeight - padding > el.clientHeight);
+      });
+  }, []);
 
   return (
     <div
@@ -44,7 +41,11 @@ export const InfoExtended = ({
           gridColumn: '',
           color: theme.color || '#eae7e1',
           backgroundColor: canDrop ? '#00000000' : bgColor,
-          padding: canDrop ? 0 : windowDimensions.height < 920 ? 5 : 50,
+          padding: canDrop
+            ? 0
+            : windowDimensions.height < 920
+            ? padding / 10
+            : padding,
           borderRadius: canDrop ? 0 : 20,
           overflowY: scroll ? 'scroll' : 'hidden',
         },
@@ -85,3 +86,4 @@ const ControlsListContainer = styled.ul`
   }
 `;
 // overflow-y: ${({ scroll }) => (scroll ? 'scroll' : 'hidden')};
+// list-style-position: inside;

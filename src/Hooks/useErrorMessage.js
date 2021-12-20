@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Context } from '../Components/Context';
-import { ItemContext } from '../Components/Item';
+import React, { useState, useEffect } from 'react';
 
-export const useErrorMessage = (state) => {
+export const useErrorMessage = state => {
   const [errorText, setErrorText] = useState('An error occured.');
   const [errorDisplay, setErrorDisplay] = useState(false);
 
@@ -53,21 +51,20 @@ export const useErrorMessage = (state) => {
   const checkForUnexpectedToken = () =>
     state.errorDetails && state.errorDetails.includes('Unexpected token');
 
-  const timeoutErrors = ['404', 'city not found', 'No photos found.'];
+  const timeoutErrors = ['404', 'City not found', 'No photos found.'];
 
   useEffect(() => {
-    (checkForUnexpectedToken() || timeoutErrors.some((a) => a === details)) &&
+    (checkForUnexpectedToken() || timeoutErrors.some(a => a === details)) &&
       setErrorDisplay(false);
   }, []);
 
-  const ErrorMessage = (props) => {
-    const { theme } = useContext(Context);
-    const { y, flexStyleX } = useContext(ItemContext);
+  const ErrorMessage = props => {
+    const { theme, y, flexStyleX, text, size } = props;
     return (
       <div
         style={{
           fontStyle: 'italic',
-          fontSize: props.size || '0.7rem',
+          fontSize: size || '0.7rem',
           color: theme.color + 'e0' || '',
           order: y === 'bottom' && -2,
           marginTop: y !== 'bottom' && 10,
@@ -75,8 +72,8 @@ export const useErrorMessage = (state) => {
           justifySelf: flexStyleX,
         }}
       >
-        {'// ' +
-          (props.text || errorText.replace(/\w/, (a) => a.toUpperCase()))}
+        {(text || errorText) &&
+          '// ' + (text || errorText.replace(/\w/, a => a.toUpperCase()))}
       </div>
     );
   };

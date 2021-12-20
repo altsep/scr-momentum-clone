@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { ItemContext } from './Item';
+import React, { useState, useEffect } from 'react';
 import ControlsSwitch from '../Misc/ControlsSwitch';
 import { IconSwitch } from '../Misc/Icons';
 
-function MyDate() {
+function MyDate(props) {
   const [data, setData] = useState(new Date());
   const [currentDate, setCurrentDate] = useState('');
   const [currentTime, setCurrentTime] = useState('');
@@ -26,8 +25,16 @@ function MyDate() {
     }
   }, [data]);
 
-  const { id, x, y, flexStyleX, isDragging, canDrop, windowSmall, windowDimensions } =
-    useContext(ItemContext);
+  const {
+    id,
+    x,
+    y,
+    flexStyleX,
+    isDragging,
+    canDrop,
+    windowSmall,
+    windowDimensions,
+  } = props;
 
   // Handle controls
   const [text, setText] = useState('date');
@@ -35,10 +42,10 @@ function MyDate() {
   const [hover, setHover] = useState(false);
 
   const handleClick = () =>
-    setText((state) => (state === 'date' ? 'time' : 'date'));
+    setText(state => (state === 'date' ? 'time' : 'date'));
 
   useEffect(() => {
-    const onKeyDown = (e) => {
+    const onKeyDown = e => {
       ((e.shiftKey && e.key.toLowerCase() === 't') ||
         (e.shiftKey && e.key.toLowerCase() === 'd')) &&
         handleClick();

@@ -6,7 +6,7 @@ export const useLoaderText = (bool, size, str) => {
   useEffect(() => {
     let intervalId = setInterval(
       () =>
-        setText((text) =>
+        setText(text =>
           bool && text.length < ref.current.length + 2
             ? text + '.'
             : ref.current
