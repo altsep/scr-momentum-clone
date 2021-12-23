@@ -171,15 +171,6 @@ body {
   }
 }
 
-@media (max-width: 960px) {
-  .item > div {
-    overflow: hidden;
-  }
-  .name-hidden-input {
-    outline: none;
-  }
-}
-
 @-webkit-keyframes saved {
   from {
     -webkit-transform: translateY(-125%);

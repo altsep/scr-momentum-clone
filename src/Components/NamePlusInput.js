@@ -70,6 +70,11 @@ const NamePlusInput = props => {
     setInputPos(posTop);
   });
 
+  useEffect(
+    () => id === 'crypto' && inputRef.current && inputRef.current.focus(),
+    [id]
+  );
+
   return (
     <div
       className='name-container'
